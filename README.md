@@ -1,2 +1,2 @@
 # AnimeWatched
-Una pagina web per vedere la mia lista di anime
+Una pagina web per gestire la propria lista di anime
