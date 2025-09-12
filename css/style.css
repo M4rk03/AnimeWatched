@@ -8,22 +8,87 @@ img {
   height: auto;
 }
 
+.space-pd{
+  padding: clamp(40px, 5vw, 50px) 0;
+}
+
+
+/* ===== Scroll fluido per tutta la pagina ===== */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ===== Stile scrollbar Chrome/Edge/Safari ===== */
+body::-webkit-scrollbar {
+  width: 10px;      
+  height: 10px;    
+}
+
+body::-webkit-scrollbar-track {
+  background: #1e1e2f; 
+  border-radius: 10px;
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: #4ffdff; 
+  border-radius: 10px;
+  border: 2px solid #1e1e2f;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background-color: #7a5fff;
+}
+
+/* ===== Stile scrollbar Firefox ===== */
+html {
+  scrollbar-width: thin;              
+  scrollbar-color: #4ffdff #1e1e2f;
+}
+
+
+/* Caricamento */
+#loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #0f0f0f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 6px solid #7a5fff;
+  border-top: 6px solid #ff4fd8; /* colore in tema Anime Watched */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
 /* Form */
 .form-control,
 .form-select {
   background-color: #1f1f1f;
   color: #fff;
   border: none;
-}
 
-.form-control::placeholder,
-.form-select::placeholder {
-  color: #aaa;
-}
+  &::placeholder {
+    color: #aaa;
+  }
 
-.form-control:focus::placeholder,
-.form-select:focus::placeholder {
-  color: #000;
+  &:focus::placeholder {
+    color: #000;
+  }
 }
 
 .btn-gradient {
@@ -31,10 +96,10 @@ img {
   color: #fff;
   font-weight: 600;
   border: none;
-}
 
-.btn-gradient:hover {
-  opacity: 0.8;
+  &:hover {
+    opacity: 0.8;
+  }
 }
 
 /* Popup */
@@ -53,12 +118,12 @@ img {
 /* Container cards */
 .grid-item.card {
   display: grid;
-  grid-template-rows: 1fr auto;
-}
+  grid-template-rows: auto 1fr;
 
-.grid-item.card .cont-img {
-  overflow: hidden;
-  aspect-ratio: 260 / 362;
+  & .cont-img {
+    overflow: hidden;
+    aspect-ratio: 260 / 362;
+  }
 }
 
 /* Cards anime */
@@ -67,11 +132,15 @@ img {
   border: none;
   transition: transform 0.2s, box-shadow 0.2s;
   position: relative;
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 18px rgba(255, 79, 216, 0.4);
+  }
 }
 
-.card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 18px rgba(255, 79, 216, 0.4);
+.card-body {
+  align-content: center;
 }
 
 .card-title {
@@ -79,28 +148,45 @@ img {
   font-size: 1rem;
   text-align: center;
   margin: 0;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* List anime search */
 #results {
-  max-height: 500px;
-  overflow-y: auto;
+  max-height: 0;
+  overflow: hidden auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 10px 5px #fff1;
+  padding-bottom: 20px;
+  opacity: 0;
+  transition: all 0.2s;
+
+  &.open {
+    max-height: 500px;
+    opacity: 1;
+  }
 }
 
 .search-item {
   color: #efefef;
-}
+  font-size: 14px;
 
-.search-item .d-grid {
-  grid-template-columns: 1fr 2fr;
-  gap: 10px;
-}
+  & .d-grid {
+    grid-template-columns: 1fr 2fr;
+    gap: 10px;
+  }
 
-.search-item .search-img img {
-  max-height: 130px;
-}
+  & .search-img img {
+    max-height: 130px;
+  }
 
-.search-item .list-group li {
-  display: block;
-  padding: 2px 0;
+  & .list-group li {
+    display: block;
+    padding: 2px 0;
+  }
 }
