@@ -56,7 +56,6 @@ function setDate(d) {
 
 // Carica gli Anime dal File DB
 async function loadAnime() {
-  // active loader
   loader.style.display = "flex";
   main.style.visibility = "hidden";
 
@@ -68,41 +67,95 @@ async function loadAnime() {
     document.getElementById("davedere").innerHTML = "";
     document.getElementById("incorso").innerHTML = "";
 
+    // Raggruppo per "serie principale"
+    const grouped = {};
     data.forEach((a) => {
-      /*if (
-      (a.stagione_id == 0 && a.stato !== "Da vedere") ||
-      (a.stagione_id == 0 && a.stato === "Da vedere") ||
-      (a.stagione_id != 0 && a.stato === "Da vedere")
-    ) {*/
+      const rootId = a.stagione_id === 0 ? a.id : a.stagione_id;
+      if (!grouped[rootId]) grouped[rootId] = [];
+      grouped[rootId].push(a);
+    });
+
+    // Creo card per ogni gruppo
+    Object.values(grouped).forEach((group) => {
+      group.sort((x, y) => (x.stagione || 0) - (y.stagione || 0));
+
+      // Determino lo stato finale della card
+      let statoFinale = "Visto";
+      let activeIndex = group.length - 1;
+
+      if (group.some((s) => s.stato === "In corso")) {
+        statoFinale = "In corso";
+        activeIndex = group.findIndex((s) => s.stato === "In corso");
+      } else if (group.some((s) => s.stato === "Da vedere")) {
+        statoFinale = "Da vedere";
+        activeIndex = group.findIndex((s) => s.stato === "Da vedere");
+      }
+
+      const activeSeason = group[activeIndex];
+
       const div = document.createElement("div");
-      div.className = "col-6 col-sm-4 col-md-3 col-lg-2";
+      div.className = "col-lg-2 col-md-3 col-sm-4 col-6";
+
+      // dropdown stagioni
+      let options = "";
+      group.forEach((s, i) => {
+        const selected = i === activeIndex ? "selected" : "";
+        options += `<option value="${i}" ${selected}>${
+          s.stagione ? "Stagione " + s.stagione : s.nome
+        }</option>`;
+      });
+
       div.innerHTML = `
-            <div class="card grid-item h-100">
-              <div class="cont-img">
-                <img src="${a.copertina}" class="card-img-top" alt="${a.nome}">
-              </div>
-              <div class="card-body p-2">
-                <h5 class="card-title">${a.nome}</h5>
-              </div>
-            </div>
-          `;
+        <div class="card grid-item h-100">
+          <div class="cont-img">
+            <img src="${activeSeason.copertina}" class="card-img-top" alt="${
+        activeSeason.nome
+      }">
+          </div>
+          <div class="card-body p-2">
+            <h5 class="card-title">${activeSeason.nome}</h5>
+            ${
+              group.length > 1
+                ? `<select class="form-select form-select-sm mt-2">${options}</select>`
+                : ""
+            }
+          </div>
+        </div>
+      `;
 
-      div.querySelector(".card").addEventListener("click", () => openModal(a));
+      const img = div.querySelector("img");
+      const title = div.querySelector(".card-title");
+      const select = div.querySelector("select");
 
-      if (a.stato === "Visto")
+      // Cambio stagione dal dropdown
+      if (select) {
+        select.addEventListener("change", (e) => {
+          const s = group[e.target.value];
+          img.src = s.copertina;
+          title.textContent = s.nome;
+        });
+      }
+
+      // Apri modal con la stagione attiva
+      div.querySelector(".card").addEventListener("click", (e) => {
+        if (e.target.tagName.toLowerCase() === "select") return;
+        const idx = select ? select.value : activeIndex;
+        openModal(group[idx]);
+      });
+
+      // Append nella sezione corretta
+      if (statoFinale === "Visto")
         document.getElementById("visti").appendChild(div);
-      if (a.stato === "Da vedere")
+      if (statoFinale === "Da vedere")
         document.getElementById("davedere").appendChild(div);
-      if (a.stato === "In corso")
+      if (statoFinale === "In corso")
         document.getElementById("incorso").appendChild(div);
-      /*}*/
     });
 
     document.getElementById("results").classList.remove("open");
   } catch (err) {
     console.error("Errore caricamento anime:", err);
   } finally {
-    // close loader
     loader.style.display = "none";
     main.style.visibility = "visible";
   }

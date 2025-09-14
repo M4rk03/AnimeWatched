@@ -8,7 +8,7 @@ img {
   height: auto;
 }
 
-.space-pd{
+.space-pd {
   padding: clamp(40px, 5vw, 50px) 0;
 }
 
@@ -20,17 +20,17 @@ html {
 
 /* ===== Stile scrollbar Chrome/Edge/Safari ===== */
 body::-webkit-scrollbar {
-  width: 10px;      
-  height: 10px;    
+  width: 10px;
+  height: 10px;
 }
 
 body::-webkit-scrollbar-track {
-  background: #1e1e2f; 
+  background: #1e1e2f;
   border-radius: 10px;
 }
 
 body::-webkit-scrollbar-thumb {
-  background-color: #4ffdff; 
+  background-color: #4ffdff;
   border-radius: 10px;
   border: 2px solid #1e1e2f;
 }
@@ -41,7 +41,7 @@ body::-webkit-scrollbar-thumb:hover {
 
 /* ===== Stile scrollbar Firefox ===== */
 html {
-  scrollbar-width: thin;              
+  scrollbar-width: thin;
   scrollbar-color: #4ffdff #1e1e2f;
 }
 
@@ -64,14 +64,20 @@ html {
   width: 60px;
   height: 60px;
   border: 6px solid #7a5fff;
-  border-top: 6px solid #ff4fd8; /* colore in tema Anime Watched */
+  border-top: 6px solid #ff4fd8;
+  /* colore in tema Anime Watched */
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 
@@ -119,6 +125,8 @@ html {
 .grid-item.card {
   display: grid;
   grid-template-rows: auto 1fr;
+  max-width: 200px;
+  margin: auto;
 
   & .cont-img {
     overflow: hidden;
