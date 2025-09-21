@@ -1,109 +1,169 @@
-// Variabili
-
+// Costanti
 const API_URL =
   "https://script.google.com/macros/s/AKfycby8ZsgjY-2TdqjwQ5RKjNNe1A6dt62o4P2cGjYG_wszOwRd9dNlcfeNgjHx2DQuFalzFw/exec";
 
+// Variabili globali
 let selectedAnime = null;
-let animeModal;
-let confirmModal;
+let animeModal, confirmModal;
 
-var loader = document.getElementById("loader");
-var main = document.getElementById("maincontent");
+const loader = document.getElementById("loader");
+const main = document.getElementById("maincontent");
 
-// Funzioni
-
+// Inizializzazione modali al caricamento
 document.addEventListener("DOMContentLoaded", () => {
   animeModal = new bootstrap.Modal(document.getElementById("animeModal"));
   confirmModal = new bootstrap.Modal(document.getElementById("confirmModal"));
 });
 
+// Utility Loader
+function toggleLoader(show = true) {
+  loader.style.display = show ? "flex" : "none";
+  main.style.visibility = show ? "hidden" : "visible";
+}
+
+// Filtri visualizzazione
+document.querySelectorAll(".btn-theme").forEach((button) => {
+  button.addEventListener("click", function (e) {
+    e.preventDefault();
+
+    document
+      .querySelectorAll(".btn-theme")
+      .forEach((btn) => btn.classList.remove("active"));
+    this.classList.add("active");
+
+    document.querySelectorAll(".show-all").forEach((section) => {
+      section.style.display = "none";
+    });
+
+    const target = this.getAttribute("href");
+    if (target === ".show-all") {
+      document.querySelectorAll(".show-all").forEach((section) => {
+        section.style.display = "block";
+      });
+    } else {
+      const selected = document.querySelector(target);
+      if (selected) {
+        selected.parentElement.style.display = "block";
+      }
+    }
+  });
+});
+
+// Formattazione data
+function setDate(d) {
+  const date = new Date(d);
+  return date.toLocaleDateString("it-IT", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+// Avviso messaggi (Toast)
+function showToast(message, type = "success") {
+  const toastEl = document.getElementById("toastMsg");
+  toastEl.className = `toast align-items-center text-white bg-${type} border-0`;
+  toastEl.querySelector(".toast-body").textContent = message;
+  const toast = new bootstrap.Toast(toastEl);
+  toast.show();
+}
+
+// Apri modal modifica
 function openModal(anime) {
   selectedAnime = anime;
-  document.getElementById("modalNome").value = anime.nome;
-  document.getElementById("modalImg").src = anime.copertina;
-  document.getElementById("modalCopertina").value = anime.copertina;
-  document.getElementById("modalStato").value = anime.stato;
-  document.getElementById("modalTipo").value = anime.tipo;
-  document.getElementById("modalStagione").value = anime.stagione;
-  document.getElementById("modalEpisodi").value = anime.episodi;
-  document.getElementById("modalEpisodiTOT").value = anime.episodi_tot;
-  document.getElementById("modalData").value = anime.data.split("T")[0];
-  document.getElementById("modalFine").value = anime.fine;
+
+  const fields = {
+    modalNome: anime.nome,
+    modalImg: anime.copertina,
+    modalCopertina: anime.copertina,
+    modalStato: anime.stato,
+    modalTipo: anime.tipo,
+    modalStagione: anime.stagione,
+    modalEpisodi: anime.episodi,
+    modalEpisodiTOT: anime.episodi_tot,
+    modalData: anime.data?.split("T")[0],
+    modalFine: anime.fine,
+  };
+
+  for (const [id, value] of Object.entries(fields)) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.tagName === "IMG" ? (el.src = value) : (el.value = value);
+    }
+  }
 
   animeModal.show();
 }
 
+// Apri modal conferma
 function openConfirmModal(anime) {
   selectedAnime = anime;
+
   document.getElementById("confirmNome").value =
     anime.title_english ?? anime.title;
-  document.getElementById("confirmImg").src = anime.images.jpg.image_url;
+  document.getElementById("confirmImg").src =
+    anime.images?.jpg?.image_url || "";
   document.getElementById("confirmStato").selectedIndex = 0;
 
   confirmModal.show();
 }
 
-// Set data Anime
-function setDate(d) {
-  let date = new Date(d);
-
-  return (formatted = date.toLocaleDateString("it-IT", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }));
+// Reset sezioni anime
+function resetSections() {
+  ["visti", "davedere", "incorso"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = "";
+  });
 }
 
-// Carica gli Anime dal File DB
+// Carica gli Anime dal DB
 async function loadAnime() {
-  loader.style.display = "flex";
-  main.style.visibility = "hidden";
+  toggleLoader(true);
 
   try {
     const res = await fetch(API_URL);
     const data = await res.json();
 
-    document.getElementById("visti").innerHTML = "";
-    document.getElementById("davedere").innerHTML = "";
-    document.getElementById("incorso").innerHTML = "";
+    resetSections();
 
     // Raggruppo per "serie principale"
-    const grouped = {};
-    data.forEach((a) => {
-      const rootId = a.stagione_id === 0 ? a.id : a.stagione_id;
-      if (!grouped[rootId]) grouped[rootId] = [];
-      grouped[rootId].push(a);
-    });
+    const grouped = data.reduce((acc, anime) => {
+      const rootId = anime.stagione_id || anime.id;
+      acc[rootId] = acc[rootId] || [];
+      acc[rootId].push(anime);
+      return acc;
+    }, {});
 
     // Creo card per ogni gruppo
     Object.values(grouped).forEach((group) => {
-      group.sort((x, y) => (x.stagione || 0) - (y.stagione || 0));
+      group.sort((a, b) => (a.stagione || 0) - (b.stagione || 0));
 
       // Determino lo stato finale della card
       let statoFinale = "Visto";
       let activeIndex = group.length - 1;
 
-      if (group.some((s) => s.stato === "In corso")) {
+      if (group.some((a) => a.stato === "In corso")) {
         statoFinale = "In corso";
-        activeIndex = group.findIndex((s) => s.stato === "In corso");
-      } else if (group.some((s) => s.stato === "Da vedere")) {
+        activeIndex = group.findIndex((a) => a.stato === "In corso");
+      } else if (group.some((a) => a.stato === "Da vedere")) {
         statoFinale = "Da vedere";
-        activeIndex = group.findIndex((s) => s.stato === "Da vedere");
+        activeIndex = group.findIndex((a) => a.stato === "Da vedere");
       }
 
       const activeSeason = group[activeIndex];
-
       const div = document.createElement("div");
       div.className = "col-lg-2 col-md-3 col-sm-4 col-6";
 
       // dropdown stagioni
-      let options = "";
-      group.forEach((s, i) => {
-        const selected = i === activeIndex ? "selected" : "";
-        options += `<option value="${i}" ${selected}>${
-          s.stagione ? "Stagione " + s.stagione : s.nome
-        }</option>`;
-      });
+      const options = group
+        .map(
+          (s, i) => `
+        <option value="${i}" ${i === activeIndex ? "selected" : ""}>
+          ${s.stagione ? "Stagione " + s.stagione : s.nome}
+        </option>
+      `
+        )
+        .join("");
 
       div.innerHTML = `
         <div class="card grid-item h-100">
@@ -136,133 +196,139 @@ async function loadAnime() {
         });
       }
 
-      // Apri modal con la stagione attiva
       div.querySelector(".card").addEventListener("click", (e) => {
         if (e.target.tagName.toLowerCase() === "select") return;
         const idx = select ? select.value : activeIndex;
         openModal(group[idx]);
       });
 
-      // Append nella sezione corretta
-      if (statoFinale === "Visto")
-        document.getElementById("visti").appendChild(div);
-      if (statoFinale === "Da vedere")
-        document.getElementById("davedere").appendChild(div);
-      if (statoFinale === "In corso")
-        document.getElementById("incorso").appendChild(div);
+      const statoToId = {
+        Visto: "visti",
+        "In corso": "incorso",
+        "Da vedere": "davedere",
+      };
+      document.getElementById(statoToId[statoFinale])?.appendChild(div);
     });
 
     document.getElementById("results").classList.remove("open");
+    document.getElementById("results").parentElement.style.display = "none";
   } catch (err) {
     console.error("Errore caricamento anime:", err);
   } finally {
-    loader.style.display = "none";
-    main.style.visibility = "visible";
+    toggleLoader(false);
   }
 }
 
-// Cerca l'Anime tramite API
-async function searchAnime(event) {
-  event.preventDefault();
+// Crea card di ricerca anime
+function createSearchCard(anime) {
+  const card = document.createElement("div");
+  card.className = "col-md-10 col-lg-6";
 
-  const title = document.getElementById("animeTitle").value;
-  const url = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(title)}`;
+  const title = anime.title_english ?? anime.title;
+  const year = anime.year ?? "?";
+  const type = anime.type ?? "?";
+  const episodes = anime.episodes ?? "?";
+  const status = anime.status ?? "?";
+  const date = setDate(anime.aired?.from);
+  const synopsis = anime.synopsis ?? "";
 
-  const response = await fetch(url);
-  const data = await response.json();
-
-  const container = document.getElementById("results");
-  container.innerHTML = "";
-
-  data.data.forEach((anime) => {
-    const card = document.createElement("div");
-    card.className = "col-md-10 col-xl-6";
-
-    card.innerHTML = `
-      <div class="card search-item">
-        <div class="d-grid align-items-center mb-2">
-          <div class="search-img text-center">
-            <img src="${anime.images.jpg.image_url}" alt="Cover">
-          </div>
-          <div class="search-body p-2">
-            <h3 class="card-title text-start mb-3">${
-              anime.title_english ?? anime.title
-            } (${anime.year ?? "?"})</h3>
-            <ul class="list-group">
-              <li><b>Tipo:</b> ${anime.type ?? "?"}</li>
-              <li><b>Episodi:</b> ${anime.episodes ?? "?"}</li>
-              <li><b>Stato:</b> ${anime.status}</li>
-              <li><b>Data:</b> ${setDate(anime.aired.from)}</li>
-            </ul>
-          </div>
+  card.innerHTML = `
+    <div class="card search-item">
+      <div class="d-grid align-items-center mb-2">
+        <div class="search-img text-center">
+          <img src="${anime.images?.jpg?.image_url}" alt="${title}">
         </div>
-        <div class="search-desc p-2">
-          <button class="btn btn-link p-0"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#collapse${anime.mal_id}"
-                  aria-expanded="false"
-                  aria-controls="collapse${anime.mal_id}">
-            <b>Trama</b>
-          </button>
-          <div id="collapse${anime.mal_id}" class="collapse">
-            <div class="py-2">${anime.synopsis ?? ""}</div>
-          </div>
-          <div style="float: right;">
-            <button class="btn btn-gradient btn-save mt-2" style="float: right;">
-              Salva
-            </button>
-          </div>
+        <div class="search-body p-2">
+          <h3 class="card-title text-start mb-3">${title} (${year})</h3>
+          <ul class="list-group">
+            <li><b>Tipo:</b> ${type}</li>
+            <li><b>Episodi:</b> ${episodes}</li>
+            <li><b>Stato:</b> ${status}</li>
+            <li><b>Data:</b> ${date}</li>
+          </ul>
         </div>
       </div>
-    `;
+      <div class="search-desc p-2">
+        <button class="btn btn-link p-0" data-bs-toggle="collapse"
+                data-bs-target="#collapse${anime.mal_id}"
+                aria-expanded="false" aria-controls="collapse${anime.mal_id}">
+          <b>Trama</b>
+        </button>
+        <div id="collapse${anime.mal_id}" class="collapse">
+          <div class="py-2">${synopsis}</div>
+        </div>
+        <div style="float: right;">
+          <button class="btn btn-gradient btn-save">Salva</button>
+        </div>
+      </div>
+    </div>
+  `;
 
-    card
-      .querySelector(".btn-save")
-      .addEventListener("click", () => openConfirmModal(anime));
-    container.appendChild(card);
-  });
-
-  container.classList.add("open");
+  card
+    .querySelector(".btn-save")
+    .addEventListener("click", () => openConfirmModal(anime));
+  return card;
 }
 
-// Aggiunge gli Anime al File DB
-async function addAnime(response) {
-  if (!selectedAnime) return;
-  if (!response) return;
+// Cerca anime
+async function searchAnime(event) {
+  event.preventDefault();
+  const title = document.getElementById("animeTitle").value.trim();
+  console.log("Cercando anime:", title);
+  if (!title) return;
 
-  // active loader
-  loader.style.display = "flex";
-  main.style.visibility = "hidden";
+  const url = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(title)}`;
+  const container = document.getElementById("results");
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    container.innerHTML = "";
+    data.data.forEach((anime) =>
+      container.appendChild(createSearchCard(anime))
+    );
+    container.classList.add("open");
+    container.parentElement.style.display = "block";
+  } catch (err) {
+    console.error("Errore nella ricerca:", err);
+  }
+}
+
+// Aggiungi anime
+async function addAnime(response) {
+  if (!selectedAnime || !response) return;
+
+  toggleLoader(true);
   let message = "";
 
   try {
-    const nome = document.getElementById("confirmNome").value;
+    const nome = document.getElementById("confirmNome").value.trim();
     const copertina = document.getElementById("confirmImg").src;
     const stato = document.getElementById("confirmStato").value.trim();
 
     if (nome && copertina && stato) {
-      const response = await fetch(API_URL, {
+      const payload = {
+        action: "add",
+        nome,
+        copertina,
+        stato,
+        tipo: selectedAnime.type,
+        episodi:
+          selectedAnime.status === "Finished Airing" && stato === "Visto"
+            ? selectedAnime.episodes
+            : 0,
+        episodi_tot: selectedAnime.episodes,
+        data: selectedAnime.aired?.from?.split("T")[0],
+        fine: selectedAnime.status,
+      };
+
+      await fetch(API_URL, {
         method: "POST",
         mode: "no-cors",
-        body: JSON.stringify({
-          action: "add",
-          nome: nome,
-          copertina: copertina,
-          stato: stato,
-          tipo: selectedAnime.type,
-          episodi:
-            selectedAnime.status == "Finished Airing"
-              ? selectedAnime.episodes
-              : 0,
-          episodi_tot: selectedAnime.episodes,
-          data: selectedAnime.aired.from.split("T")[0],
-          fine: selectedAnime.status,
-        }),
+        body: JSON.stringify(payload),
         headers: { "Content-Type": "application/json" },
       });
-
-      // reset campi input
-      stato.selectedIndex = 0;
 
       confirmModal.hide();
       loadAnime();
@@ -271,75 +337,58 @@ async function addAnime(response) {
       message = "Compila tutti i campi!";
     }
   } catch (err) {
-    console.error("Errore caricamento anime:", err);
+    console.error("Errore aggiunta anime:", err);
+    message = "Errore durante l'aggiunta";
   } finally {
-    // close loader
-    loader.style.display = "none";
-    main.style.visibility = "visible";
+    toggleLoader(false);
+    showToast(message);
   }
-
-  alert(message);
 }
 
-// Salva le modifiche dell'Anime sul File DB
+// Salva modifiche anime
 async function saveAnime() {
   if (!selectedAnime) return;
 
-  // active loader
-  loader.style.display = "flex";
-  main.style.visibility = "hidden";
+  toggleLoader(true);
 
   try {
-    const nuovoNome = document.getElementById("modalNome").value;
-    const nuovaCopertina = document.getElementById("modalCopertina").value;
-    const nuovoStato = document.getElementById("modalStato").value;
-    const nuovoTipo = document.getElementById("modalTipo").value;
-    const nuovaStaione = document.getElementById("modalStagione").value;
-    const nuovoEpisodi = document.getElementById("modalEpisodi").value;
-    const nuovoEpTot = document.getElementById("modalEpisodiTOT").value;
-    const nuovaData = document.getElementById("modalData").value;
-    const nuovoFine = document.getElementById("modalFine").value;
+    const payload = {
+      action: "update",
+      id: selectedAnime.id,
+      nome: document.getElementById("modalNome").value,
+      copertina: document.getElementById("modalCopertina").value,
+      stato: document.getElementById("modalStato").value,
+      tipo: document.getElementById("modalTipo").value,
+      stagione: document.getElementById("modalStagione").value,
+      stagione_id: selectedAnime.stagione_id,
+      episodi: document.getElementById("modalEpisodi").value,
+      episodi_tot: document.getElementById("modalEpisodiTOT").value,
+      data: document.getElementById("modalData").value,
+      fine: document.getElementById("modalFine").value,
+    };
 
     await fetch(API_URL, {
       method: "POST",
       mode: "no-cors",
-      body: JSON.stringify({
-        action: "update",
-        id: selectedAnime.id,
-        nome: nuovoNome,
-        copertina: nuovaCopertina,
-        stato: nuovoStato,
-        tipo: nuovoTipo,
-        stagione: nuovaStaione,
-        stagione_id: selectedAnime.stagione_id,
-        episodi: nuovoEpisodi,
-        episodi_tot: nuovoEpTot,
-        data: nuovaData,
-        fine: nuovoFine,
-      }),
+      body: JSON.stringify(payload),
       headers: { "Content-Type": "application/json" },
     });
 
     animeModal.hide();
     loadAnime();
+    showToast("Anime modificato");
   } catch (err) {
-    console.error("Errore caricamento anime:", err);
+    console.error("Errore salvataggio anime:", err);
   } finally {
-    // close loader
-    loader.style.display = "none";
-    main.style.visibility = "visible";
+    toggleLoader(false);
   }
-
-  alert("Anime modificato");
 }
 
-// Elimina l'Anime dal File DB
+// Elimina anime
 async function deleteAnime() {
   if (!selectedAnime) return;
 
-  // active loader
-  loader.style.display = "flex";
-  main.style.visibility = "hidden";
+  toggleLoader(true);
 
   try {
     await fetch(API_URL, {
@@ -351,15 +400,13 @@ async function deleteAnime() {
 
     animeModal.hide();
     loadAnime();
+    showToast("Anime eliminato dalla lista");
   } catch (err) {
-    console.error("Errore caricamento anime:", err);
+    console.error("Errore eliminazione anime:", err);
   } finally {
-    // close loader
-    loader.style.display = "none";
-    main.style.visibility = "visible";
+    toggleLoader(false);
   }
-
-  alert("Anime eliminato dalla lista");
 }
 
+// Avvio iniziale
 loadAnime();

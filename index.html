@@ -2,7 +2,7 @@
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Anime Watched</title>
 
     <link rel="icon" href="./assets/favicon.ico" type="image/x-icon" />
@@ -11,56 +11,78 @@
     <link href="./css/style.css" rel="stylesheet" />
   </head>
 
-  <body class="container py-4">
-
+  <body class="">
     <!-- Loader -->
     <div id="loader">
       <div class="spinner"></div>
     </div>
 
-    <!-- Main -->
-    <main id="maincontent">
+    <!-- Header -->
+    <header id="header" class="mb-5">
+      <nav class="navbar bg-body-tertiary border-bottom" data-bs-theme="dark">
+        <div class="container-fluid">
+          <a class="navbar-brand">Anime Watched</a>
 
-      <h1 class="text-center mb-3">📺 La mia lista di Anime</h1>
+          <div class="col-md-5">
+            <form
+              class="d-flex"
+              role="search"
+              action="#"
+              onsubmit="searchAnime(event)"
+              method="post"
+            >
+              <input
+                class="form-control me-2"
+                type="search"
+                id="animeTitle"
+                placeholder="Titolo anime"
+                aria-label="Titolo anime"
+              />
+              <button class="btn btn-gradient" type="submit">Cerca</button>
+            </form>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Risultati ricerca -->
+    <div class="s-overlay">
+      <button
+        type="button"
+        class="btn-close"
+        onclick="this.parentElement.style.display = 'none';"
+        aria-label="Close"
+      ></button>
+      <div
+        id="results"
+        class="container mx-auto mt-5 row gy-4 justify-content-center"
+      ></div>
+    </div>
+
+    <!-- Main -->
+    <main id="maincontent" class="container">
+      <h1 class="text-center mb-2">📺 La mia lista di Anime</h1>
 
       <section class="space-pd">
-        <form action="#" onsubmit="searchAnime(event)" method="post">
-          <div class="row g-2 justify-content-center align-items-center">
-            <div class="col-md-auto me-md-3">
-              <h2 class="h6">Cerca Anime da aggiungere</h2>
-            </div>
-            <div class="col-md-5">
-              <input
-                type="text"
-                id="animeTitle"
-                class="form-control"
-                placeholder="Titolo anime"
-              />
-            </div>
-            <div class="col-md-2">
-              <button class="btn btn-gradient w-100">Cerca</button>
-            </div>
-          </div>
-        </form>
-
-        <div class="cont space-pd pb-0">
-          <div id="results" class="row gy-4 justify-content-center"></div>
+        <div class="d-flex flex-wrap justify-content-center gap-2 mb-5">
+          <a class="btn btn-theme active" href=".show-all" role="button">Tutti</a>
+          <a class="btn btn-theme" href="#visti" role="button">Visti</a>
+          <a class="btn btn-theme" href="#davedere" role="button">Da vedere</a>
+          <a class="btn btn-theme" href="#incorso" role="button">In corso</a>
         </div>
-      </section>
 
-      <section>
-        <div class="mb-5">
-          <h2 class="text-center pb-3">✅ Visti</h2>
+        <div class="show-all mb-5">
+          <h2 class="h3 pb-3">✅ Visti</h2>
           <div id="visti" class="row g-3"></div>
         </div>
 
-        <div class="mb-5">
-          <h2 class="text-center pb-3">⏳ Da vedere</h2>
+        <div class="show-all mb-5">
+          <h2 class="h3 pb-3">⏳ Da vedere</h2>
           <div id="davedere" class="row g-3"></div>
         </div>
 
-        <div class="mb-5">
-          <h2 class="text-center pb-3">▶️ In corso</h2>
+        <div class="show-all">
+          <h2 class="h3 pb-3">▶️ In corso</h2>
           <div id="incorso" class="row g-3"></div>
         </div>
       </section>
@@ -96,7 +118,9 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                  <label for="modalCopertina" class="form-label">URL Copertina</label>
+                  <label for="modalCopertina" class="form-label"
+                    >URL Copertina</label
+                  >
                   <input type="text" id="modalCopertina" class="form-control" />
                 </div>
 
@@ -120,12 +144,16 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                  <label for="modalEpisodi" class="form-label">Episodi visti</label>
+                  <label for="modalEpisodi" class="form-label"
+                    >Episodi visti</label
+                  >
                   <input type="number" id="modalEpisodi" class="form-control" />
                 </div>
 
                 <div class="col-md-6 mb-3">
-                  <label for="modalEpisodiTOT" class="form-label">Episodi</label>
+                  <label for="modalEpisodiTOT" class="form-label"
+                    >Episodi</label
+                  >
                   <input
                     type="number"
                     id="modalEpisodiTOT"
@@ -215,8 +243,26 @@
           </div>
         </div>
       </div>
-
     </main>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div
+        id="toastMsg"
+        class="toast align-items-center text-white bg-success border-0"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="d-flex">
+          <div class="toast-body">Anime salvato con successo!</div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+          ></button>
+        </div>
+      </div>
+    </div>
 
     <script src="./js/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
