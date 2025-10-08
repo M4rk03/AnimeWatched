@@ -159,7 +159,7 @@ async function loadAnime() {
         .map(
           (s, i) => `
         <option value="${i}" ${i === activeIndex ? "selected" : ""}>
-          ${s.stagione ? "Stagione " + s.stagione : s.nome}
+          ${s.stagione ? "S" + s.stagione : s.nome}
         </option>
       `
         )
@@ -176,7 +176,7 @@ async function loadAnime() {
             <h5 class="card-title">${activeSeason.nome}</h5>
             ${
               group.length > 1
-                ? `<select class="form-select form-select-sm mt-2">${options}</select>`
+                ? `<select class="form-select form-select-sm card-season mt-2">${options}</select>`
                 : ""
             }
           </div>
