@@ -11,7 +11,7 @@
     <link href="./css/style.css" rel="stylesheet" />
   </head>
 
-  <body class="">
+  <body>
     <!-- Loader -->
     <div id="loader">
       <div class="spinner"></div>
@@ -145,7 +145,7 @@
 
                 <div class="grid-line gd-col-3 mb-3">
                   <label for="modalEpisodi" class="form-label" >Episodi</label>
-                  <input type="number" id="modalEpisodi" class="form-control" />
+                  <input type="number" id="modalEpisodi" min="0" class="form-control" />
                   <input type="number" id="modalEpisodiTOT" class="form-control" disabled/>
                 </div>
 
@@ -161,25 +161,25 @@
               </div>
             </div>
 
-            <div class="modal-footer">
-              <button class="btn btn-danger" onclick="deleteAnime()">
-                🗑️ Elimina
+            <div class="modal-footer justify-content-between">
+              <button class="btn btn-gradient" onclick="updateSavedAnime()">
+                Aggiorna
               </button>
-              <button class="btn btn-primary" onclick="saveAnime()">
-                💾 Salva
-              </button>
+              <div>
+                <button class="btn btn-danger me-1" onclick="deleteAnime()">
+                  🗑️ Elimina
+                </button>
+                <button class="btn btn-primary" onclick="saveAnime()">
+                  💾 Salva
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Modal Aggiunta Anime -->
-      <div
-        class="modal fade"
-        id="confirmModal"
-        tabindex="-1"
-        aria-hidden="true"
-      >
+      <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-header">
