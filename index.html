@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Anime Watched</title>
 
-    <link rel="icon" href="./assets/favicon.ico" type="image/x-icon" />
+    <link rel="icon" type="image/png" href="./assets/favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.svg" />
+    <link rel="shortcut icon" href="./assets/favicon/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Anime Watched" />
+    <link rel="manifest" href="./assets/favicon/site.webmanifest" />
 
     <link href="./css/bootstrap.min.css" rel="stylesheet" />
     <link href="./css/style.css" rel="stylesheet" />
@@ -19,9 +24,9 @@
 
     <!-- Header -->
     <header id="header" class="mb-5">
-      <nav class="navbar bg-body-tertiary border-bottom" data-bs-theme="dark">
-        <div class="container-fluid">
-          <a class="navbar-brand">Anime Watched</a>
+      <nav class="navbar bg-theme-dark border-bottom" data-bs-theme="dark">
+        <div class="container-fluid justify-content-around justify-content-sm-between">
+          <a class="navbar-brand" href="./index.html"><img src="./assets/logo-AW.png" alt="Anime Watched" width="200"></a>
 
           <div class="col-md-5">
             <form
@@ -65,7 +70,9 @@
 
       <section class="space-pd">
         <div class="d-flex flex-wrap justify-content-center gap-2 mb-5">
-          <a class="btn btn-theme active" href=".show-all" role="button">Tutti</a>
+          <a class="btn btn-theme active" href=".show-all" role="button"
+            >Tutti</a
+          >
           <a class="btn btn-theme" href="#visti" role="button">Visti</a>
           <a class="btn btn-theme" href="#davedere" role="button">Da vedere</a>
           <a class="btn btn-theme" href="#incorso" role="button">In corso</a>
@@ -135,7 +142,12 @@
 
                 <div class="col-sm-6 grid-line gd-col-2 mb-3">
                   <label for="modalTipo" class="form-label">Tipo</label>
-                  <input type="text" id="modalTipo" class="form-control" disabled/>
+                  <input
+                    type="text"
+                    id="modalTipo"
+                    class="form-control"
+                    disabled
+                  />
                 </div>
 
                 <div class="col-sm-6 grid-line gd-col-2 mb-3">
@@ -144,14 +156,29 @@
                 </div>
 
                 <div class="grid-line gd-col-3 mb-3">
-                  <label for="modalEpisodi" class="form-label" >Episodi</label>
-                  <input type="number" id="modalEpisodi" min="0" class="form-control" />
-                  <input type="number" id="modalEpisodiTOT" class="form-control" disabled/>
+                  <label for="modalEpisodi" class="form-label">Episodi</label>
+                  <input
+                    type="number"
+                    id="modalEpisodi"
+                    min="0"
+                    class="form-control"
+                  />
+                  <input
+                    type="number"
+                    id="modalEpisodiTOT"
+                    class="form-control"
+                    disabled
+                  />
                 </div>
 
                 <div class="col-sm-6 mb-3">
                   <label for="modalData" class="form-label">Data uscita</label>
-                  <input type="date" id="modalData" class="form-control" disabled/>
+                  <input
+                    type="date"
+                    id="modalData"
+                    class="form-control"
+                    disabled
+                  />
                 </div>
 
                 <div class="col-sm-6 mb-3">
@@ -179,7 +206,12 @@
       </div>
 
       <!-- Modal Aggiunta Anime -->
-      <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+      <div
+        class="modal fade"
+        id="confirmModal"
+        tabindex="-1"
+        aria-hidden="true"
+      >
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-header">

@@ -1,6 +1,28 @@
+:root {
+  --bs-body: #0f111a;
+  --bs-text: #f5f5f5;
+  --bs-primary: #4ffdff;
+  --bs-secondary: #ff4fd8;
+  --bs-third: #7a5fff;
+  --bs-light: #fff;
+  --bs-dark: #000b1d;
+  --bs-font-sans-serif: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --bs-font-monospace: 'Courier New', Courier, monospace;
+  --bs-gradient: linear-gradient(45deg, var(--bs-primary), var(--bs-third));
+  --bs-gradient2: linear-gradient(45deg, var(--bs-secondary), var(--bs-third));
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-  background-color: #0f0f0f;
-  color: #f5f5f5;
+  background-color: var(--bs-body);
+  color: var(--bs-text);
+}
+
+a {
+ transition: 0.3s;
 }
 
 img {
@@ -25,24 +47,24 @@ body::-webkit-scrollbar {
 }
 
 body::-webkit-scrollbar-track {
-  background: #1e1e2f;
+  background: #14161f;
   border-radius: 10px;
 }
 
 body::-webkit-scrollbar-thumb {
-  background-color: #4ffdff;
+  background-color: var(--bs-primary);
   border-radius: 10px;
-  border: 2px solid #1e1e2f;
+  border: 2px solid #14161f;
 }
 
 body::-webkit-scrollbar-thumb:hover {
-  background-color: #7a5fff;
+  background-color: var(--bs-third);
 }
 
 /* ===== Stile scrollbar Firefox ===== */
 html {
   scrollbar-width: thin;
-  scrollbar-color: #4ffdff #1e1e2f;
+  scrollbar-color: var(--bs-primary) #14161f;
 }
 
 
@@ -53,7 +75,7 @@ html {
   left: 0;
   width: 100%;
   height: 100%;
-  background: #0f0f0f;
+  background: var(--bs-body);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -63,8 +85,8 @@ html {
 .spinner {
   width: 60px;
   height: 60px;
-  border: 6px solid #7a5fff;
-  border-top: 6px solid #ff4fd8;
+  border: 6px solid var(--bs-third);
+  border-top: 6px solid var(--bs-secondary);
   /* colore in tema Anime Watched */
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -89,28 +111,43 @@ html {
   width: 80%;
   max-width: 600px;
   z-index: 999999;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0, 0, 0, 0.8);
   padding: 10px 15px;
   border-radius: 10px;
   color: white;
-  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
 }
 
+/* Header */
+.bg-theme-dark {
+  background-color: var(--bs-dark);
+}
 
+.navbar .form-control {
+  background-color: var(--bs-body);
+}
 
 /* Form */
 .form-control,
 .form-select {
-  background-color: #1f1f1f;
+  background-color: #0c0d12;
   color: #fff;
   border: none;
 }
 
+.form-control:focus,
+.form-select:focus {
+  background-color: #0c0d12;
+  color: #fff;
+  box-shadow: 0 0 6px 0.25rem rgba(79, 253, 255, 0.2);
+}
+
 .btn-gradient {
-  background: linear-gradient(45deg, #ff4fd8, #7a5fff);
+  background: var(--bs-gradient2);
   color: #fff;
   font-weight: 600;
   border: none;
+  min-width: 90px;
 
   &:hover {
     opacity: 0.8;
@@ -118,10 +155,11 @@ html {
 }
 
 .btn-theme {
-  background: linear-gradient(45deg, #4ffdff, #7a5fff);
-  color: #0f0f0f;
+  background: var(--bs-gradient);
+  color: #0f111a;
   font-weight: 600;
-  min-width: 100px;
+  max-width: 140px;
+  flex: 1 1 140px;
 
   &:hover {
     opacity: 0.8;
@@ -129,13 +167,13 @@ html {
 
   &.active {
     background: transparent;
-    border: 2px solid #4ffdff;
+    border: 2px solid var(--bs-primary);
   }
 }
 
 /* Popup */
 .modal-content {
-  background-color: #0f0f0f;
+  background-color: #0f111a;
 }
 
 .modal-header .btn-close {
@@ -169,6 +207,7 @@ html {
   grid-template-rows: auto 1fr;
   max-width: 200px;
   margin: auto;
+  overflow: hidden;
 
   & .cont-img {
     overflow: hidden;
@@ -178,7 +217,7 @@ html {
 
 /* Cards anime */
 .card {
-  background-color: #1a1a1a;
+  background-color: #14161f;
   border: none;
   transition: transform 0.2s, box-shadow 0.2s;
   position: relative;
@@ -194,7 +233,7 @@ html {
 }
 
 .card-title {
-  color: #ff4fd8;
+  color: var(--bs-secondary);
   font-size: 1rem;
   text-align: center;
   margin: 0;
@@ -207,7 +246,7 @@ html {
 }
 
 .card-season {
-  background: linear-gradient(45deg, #ff4fd8, #7a5fff);
+  background: var(--bs-gradient2);
   color: #0f0f0f;
   font-weight: 700;
   font-size: 16px;
@@ -220,7 +259,7 @@ html {
   padding: 4px 8px;
 
   & option {
-    background: #ff4fd8;
+    background: var(--bs-secondary);
     color: #0f0f0f;
     font-weight: 700;
     font-size: 16px;
@@ -233,7 +272,7 @@ html {
   overflow: hidden auto;
   border-radius: 0.5rem;
   box-shadow: 0 0 10px 5px #0003;
-  background-color: #0f0f0f;
+  background-color: var(--bs-body);
   padding-bottom: 20px;
   opacity: 0;
   transition: all 0.2s;
@@ -254,7 +293,7 @@ html {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #29224fcc;
+  background-color: #000C;
   z-index: 999;
 
   &>.btn-close {

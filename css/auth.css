@@ -1,0 +1,76 @@
+/* === Pagina registrazione === */
+
+html,
+body {
+  height: 100%;
+  font-family: Inter, system-ui, Segoe UI, Roboto, "Helvetica Neue", Arial;
+}
+
+.cd-auth {
+  border-radius: 16px;
+  box-shadow: 0 8px 14px rgba(0, 0, 0, 0.6);
+  color: var(--bs-text);
+  max-width: 420px;
+  width: 100%;
+  padding: 32px;
+}
+
+form#signupForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#signupForm label {
+  font-size: 13px;
+}
+
+#signupForm ::placeholder {
+  color: var(--bs-text);
+}
+
+#signupForm .btn-gradient {
+  background: var(--bs-gradient);
+  color: #000;
+}
+
+.alt {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 10px;
+}
+
+.link {
+  position: relative;
+  color: #dbeafe;
+  text-decoration: none;
+  border-bottom: 1.5px solid var(--bs-text);
+}
+
+.link::before {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-bottom: 1.5px solid var(--bs-primary);
+  transition: 0.3s;
+}
+
+.link:hover {
+  color: var(--bs-primary);
+}
+
+.link:hover:before {
+  width: 100%;
+}
+
+.hint {
+  font-size: 13px;
+  color: #fca5a5;
+  text-align: center;
+  display: none;
+  margin-top: 8px;
+}

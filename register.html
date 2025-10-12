@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Registrazione - Anime Watched</title>
+
+    <link rel="icon" type="image/png" href="./assets/favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.svg" />
+    <link rel="shortcut icon" href="./assets/favicon/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Anime Watched" />
+    <link rel="manifest" href="./assets/favicon/site.webmanifest" />
+
+    <link href="./css/bootstrap.min.css" rel="stylesheet" />
+    <link href="./css/style.css" rel="stylesheet" />
+    <link href="./css/auth.css" rel="stylesheet" />
+  </head>
+
+  <body">
+    <!-- Loader -->
+    <div id="loader">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <header id="header" class="mb-5">
+      <nav class="navbar bg-theme-dark border-bottom" data-bs-theme="dark">
+        <div class="container-fluid justify-content-around justify-content-sm-between">
+          <a class="navbar-brand" href="./index.html"><img src="./assets/logo-AW.png" alt="Anime Watched" width="200"></a>
+
+          <div class="col-md-5">
+            <form
+              class="d-flex"
+              role="search"
+              action="#"
+              onsubmit="searchAnime(event)"
+              method="post"
+            >
+              <input
+                class="form-control me-2"
+                type="search"
+                id="animeTitle"
+                placeholder="Titolo anime"
+                aria-label="Titolo anime"
+              />
+              <button class="btn btn-gradient" type="submit">Cerca</button>
+            </form>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main -->
+    <main id="maincontent" class="container space-pd pt-0">
+      <section class="card cd-auth mx-auto">
+        <div class="text-center mb-4">
+          <h1 class="h3 mb-2">Crea un account</h1>
+          <p>
+            Unisciti alla community AnimeWatched e tieni traccia dei tuoi anime
+            preferiti.
+          </p>
+        </div>
+
+        <form id="signupForm">
+          <div>
+            <label for="name" class="form-label">Nome utente</label>
+            <input id="name" name="name" type="text" class="form-control" placeholder="Es. OtakuLover" required />
+          </div>
+          <div>
+            <label for="email" class="form-label">Email</label>
+            <input id="email" name="email" type="email" class="form-control" placeholder="tuo@esempio.com" required autocomplete="username" />
+          </div>
+          <div>
+            <label for="password" class="form-label">Password</label>
+            <input id="password" name="password" type="password" class="form-control" placeholder="Minimo 6 caratteri" required autocomplete="new-password" />
+          </div>
+          <div>
+            <label for="confirm" class="form-label">Conferma password</label>
+            <input id="confirm" name="confirm" type="password" class="form-control" placeholder="Ripeti la password" required autocomplete="new-password" />
+          </div>
+
+          <button class="btn btn-gradient mt-3" type="submit" id="sign-up">Registrati</button>
+          <p id="feedback" class="hint"></p>
+        </form>
+
+        <div class="alt">
+          Hai già un account? <a href="login.html" class="link">Accedi</a>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div
+        id="toastMsg"
+        class="toast align-items-center text-white bg-success border-0"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="d-flex">
+          <div class="toast-body">Anime salvato con successo!</div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+          ></button>
+        </div>
+      </div>
+    </div>
+
+    <script src="./js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./js/auth.js"></script>
+
+  </body>
+</html>
