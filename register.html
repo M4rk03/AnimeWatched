@@ -5,10 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Registrazione - Anime Watched</title>
 
-    <link rel="icon" type="image/png" href="./assets/favicon/favicon-96x96.png" sizes="96x96" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="./assets/favicon/favicon-96x96.png"
+      sizes="96x96"
+    />
     <link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.svg" />
     <link rel="shortcut icon" href="./assets/favicon/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./assets/favicon/apple-touch-icon.png"
+    />
     <meta name="apple-mobile-web-app-title" content="Anime Watched" />
     <link rel="manifest" href="./assets/favicon/site.webmanifest" />
 
@@ -17,7 +26,7 @@
     <link href="./css/auth.css" rel="stylesheet" />
   </head>
 
-  <body">
+  <body>
     <!-- Loader -->
     <div id="loader">
       <div class="spinner"></div>
@@ -26,8 +35,12 @@
     <!-- Header -->
     <header id="header" class="mb-5">
       <nav class="navbar bg-theme-dark border-bottom" data-bs-theme="dark">
-        <div class="container-fluid justify-content-around justify-content-sm-between">
-          <a class="navbar-brand" href="./index.html"><img src="./assets/logo-AW.png" alt="Anime Watched" width="200"></a>
+        <div
+          class="container-fluid justify-content-around justify-content-sm-between"
+        >
+          <a class="navbar-brand" href="./index.html"
+            ><img src="./assets/logo-AW.png" alt="Anime Watched" width="200"
+          /></a>
 
           <div class="col-md-5">
             <form
@@ -62,25 +75,58 @@
           </p>
         </div>
 
-        <form id="signupForm">
+        <form id="authForm" action="" method="post">
           <div>
             <label for="name" class="form-label">Nome utente</label>
-            <input id="name" name="name" type="text" class="form-control" placeholder="Es. OtakuLover" required />
+            <input
+              id="name"
+              name="name"
+              type="text"
+              class="form-control"
+              placeholder="es. OtakuLover"
+              required
+            />
           </div>
           <div>
             <label for="email" class="form-label">Email</label>
-            <input id="email" name="email" type="email" class="form-control" placeholder="tuo@esempio.com" required autocomplete="username" />
+            <input
+              id="email"
+              name="email"
+              type="email"
+              class="form-control"
+              placeholder="nome@esempio.com"
+              required
+              autocomplete="username"
+            />
           </div>
           <div>
             <label for="password" class="form-label">Password</label>
-            <input id="password" name="password" type="password" class="form-control" placeholder="Minimo 6 caratteri" required autocomplete="new-password" />
+            <input
+              id="password"
+              name="password"
+              type="password"
+              class="form-control"
+              placeholder="Minimo 8 caratteri"
+              required
+              autocomplete="new-password"
+            />
           </div>
           <div>
             <label for="confirm" class="form-label">Conferma password</label>
-            <input id="confirm" name="confirm" type="password" class="form-control" placeholder="Ripeti la password" required autocomplete="new-password" />
+            <input
+              id="confirm"
+              name="confirm"
+              type="password"
+              class="form-control"
+              placeholder="Ripeti la password"
+              required
+              autocomplete="new-password"
+            />
           </div>
 
-          <button class="btn btn-gradient mt-3" type="submit" id="sign-up">Registrati</button>
+          <button class="btn btn-gradient mt-3" type="submit" id="signup">
+            Registrati
+          </button>
           <p id="feedback" class="hint"></p>
         </form>
 
@@ -112,6 +158,5 @@
     <script src="./js/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="./js/auth.js"></script>
-
   </body>
 </html>

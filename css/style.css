@@ -36,8 +36,11 @@ img {
 
 
 /* ===== Scroll fluido per tutta la pagina ===== */
+/* ===== Stile scrollbar Firefox ===== */
 html {
   scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bs-primary) #14161f;
 }
 
 /* ===== Stile scrollbar Chrome/Edge/Safari ===== */
@@ -59,12 +62,6 @@ body::-webkit-scrollbar-thumb {
 
 body::-webkit-scrollbar-thumb:hover {
   background-color: var(--bs-third);
-}
-
-/* ===== Stile scrollbar Firefox ===== */
-html {
-  scrollbar-width: thin;
-  scrollbar-color: var(--bs-primary) #14161f;
 }
 
 

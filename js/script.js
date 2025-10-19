@@ -9,31 +9,40 @@ const loader = document.getElementById("loader");
 const main = document.getElementById("maincontent");
 
 // ==================== INIT ====================
-document.addEventListener("DOMContentLoaded", () => {
-  animeModal = new bootstrap.Modal(document.getElementById("animeModal"));
-  confirmModal = new bootstrap.Modal(document.getElementById("confirmModal"));
+if (
+  document.getElementById("visti") &&
+  document.getElementById("davedere") &&
+  document.getElementById("incorso")
+) {
+  document.addEventListener("DOMContentLoaded", () => {
+    animeModal = new bootstrap.Modal(document.getElementById("animeModal"));
+    confirmModal = new bootstrap.Modal(document.getElementById("confirmModal"));
 
-  // Filtri visualizzazione
-  document.querySelectorAll(".btn-theme").forEach((button) => {
-    button.addEventListener("click", function (e) {
-      e.preventDefault();
-      document
-        .querySelectorAll(".btn-theme")
-        .forEach((btn) => btn.classList.remove("active"));
-      this.classList.add("active");
+    // Filtri visualizzazione
+    document.querySelectorAll(".btn-theme").forEach((button) => {
+      button.addEventListener("click", function (e) {
+        e.preventDefault();
+        document
+          .querySelectorAll(".btn-theme")
+          .forEach((btn) => btn.classList.remove("active"));
+        this.classList.add("active");
 
-      const target = this.getAttribute("href");
-      document.querySelectorAll(".show-all").forEach((section) => {
-        section.style.display = target === ".show-all" ? "block" : "none";
+        const target = this.getAttribute("href");
+        document.querySelectorAll(".show-all").forEach((section) => {
+          section.style.display = target === ".show-all" ? "block" : "none";
+        });
+
+        if (target !== ".show-all") {
+          const selected = document.querySelector(target);
+          if (selected) selected.parentElement.style.display = "block";
+        }
       });
-
-      if (target !== ".show-all") {
-        const selected = document.querySelector(target);
-        if (selected) selected.parentElement.style.display = "block";
-      }
     });
   });
-});
+  loadAnime();
+} else {
+  toggleLoader(false);
+}
 
 // ==================== UTILS ====================
 function toggleLoader(show = true) {
@@ -528,6 +537,3 @@ async function updateSavedAnime() {
     progressContainer.remove();
   }
 }
-
-// ==================== INITIAL LOAD ====================
-loadAnime();

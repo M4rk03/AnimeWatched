@@ -1,5 +1,4 @@
 /* === Pagina registrazione === */
-
 html,
 body {
   height: 100%;
@@ -10,30 +9,33 @@ body {
   border-radius: 16px;
   box-shadow: 0 8px 14px rgba(0, 0, 0, 0.6);
   color: var(--bs-text);
-  max-width: 420px;
+  max-width: 480px;
   width: 100%;
   padding: 32px;
 }
 
-form#signupForm {
+/* Form */
+form#authForm {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-#signupForm label {
+#authForm label {
   font-size: 13px;
 }
 
-#signupForm ::placeholder {
+#authForm ::placeholder {
   color: var(--bs-text);
+  opacity: 0.4;
 }
 
-#signupForm .btn-gradient {
+#authForm .btn-gradient {
   background: var(--bs-gradient);
   color: #000;
 }
 
+/* Testo */
 .alt {
   text-align: center;
   font-size: 13px;
@@ -46,25 +48,26 @@ form#signupForm {
   color: #dbeafe;
   text-decoration: none;
   border-bottom: 1.5px solid var(--bs-text);
-}
 
-.link::before {
-  content: '';
-  position: absolute;
-  display: inline-block;
-  top: 0;
-  bottom: 0;
-  width: 0;
-  border-bottom: 1.5px solid var(--bs-primary);
-  transition: 0.3s;
-}
+  &::before {
+    content: '';
+    position: absolute;
+    display: inline-block;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    border-bottom: 1.5px solid var(--bs-primary);
+    transition: 0.3s;
+  }
 
-.link:hover {
-  color: var(--bs-primary);
-}
+  &:hover {
+    color: var(--bs-primary);
 
-.link:hover:before {
-  width: 100%;
+    &:before {
+      width: 100%;
+    }
+  }
+
 }
 
 .hint {
@@ -73,4 +76,37 @@ form#signupForm {
   text-align: center;
   display: none;
   margin-top: 8px;
+}
+
+.brand .logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.brand .logo .icon {
+  min-width: 90px;
+  height: 90px;
+  border-radius: 12px;
+  place-items: center;
+  box-shadow: 0 6px 18px rgba(122, 95, 255, 0.3);
+  overflow: hidden;
+}
+
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.eye-btn {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
 }
