@@ -5,10 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Anime Watched</title>
 
-    <link rel="icon" type="image/png" href="./assets/favicon/favicon-96x96.png" sizes="96x96" />
+    <script>
+      if (!localStorage.getItem("aw_user")) {
+        window.location.href = "login.html";
+      }
+    </script>
+
+    <link
+      rel="icon"
+      type="image/png"
+      href="./assets/favicon/favicon-96x96.png"
+      sizes="96x96"
+    />
     <link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.svg" />
     <link rel="shortcut icon" href="./assets/favicon/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./assets/favicon/apple-touch-icon.png"
+    />
     <meta name="apple-mobile-web-app-title" content="Anime Watched" />
     <link rel="manifest" href="./assets/favicon/site.webmanifest" />
 
@@ -24,27 +39,68 @@
 
     <!-- Header -->
     <header id="header" class="mb-5">
-      <nav class="navbar bg-theme-dark border-bottom" data-bs-theme="dark">
-        <div class="container-fluid justify-content-around justify-content-sm-between">
-          <a class="navbar-brand" href="./index.html"><img src="./assets/logo-AW.png" alt="Anime Watched" width="200"></a>
+      <nav
+        class="navbar navbar-expand-lg bg-theme-dark border-bottom"
+        data-bs-theme="dark"
+      >
+        <div
+          class="container-fluid justify-content-around justify-content-sm-between"
+        >
+          <!-- LOGO -->
+          <a class="navbar-brand" href="./index.html">
+            <img src="./assets/logo-AW.png" alt="Anime Watched" width="200" />
+          </a>
 
-          <div class="col-md-5">
-            <form
-              class="d-flex"
-              role="search"
-              action="#"
-              onsubmit="searchAnime(event)"
-              method="post"
-            >
-              <input
-                class="form-control me-2"
-                type="search"
-                id="animeTitle"
-                placeholder="Titolo anime"
-                aria-label="Titolo anime"
-              />
-              <button class="btn btn-gradient" type="submit">Cerca</button>
-            </form>
+          <!-- Bottone hamburger (funziona su mobile) -->
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarAnime"
+            aria-controls="navbarAnime"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <!-- Menu collassabile -->
+          <div class="collapse navbar-collapse" id="navbarAnime">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+              <li class="nav-item active">
+                <a class="nav-link" href="./index.html">Lista Anime</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Ultime uscite</a>
+              </li>
+            </ul>
+
+            <!-- Barra di ricerca -->
+            <div class="col-md-5">
+              <form
+                class="d-flex"
+                role="search"
+                action="#"
+                onsubmit="searchAnime(event)"
+                method="post"
+              >
+                <input
+                  class="form-control me-2"
+                  type="search"
+                  id="animeTitle"
+                  placeholder="Titolo anime"
+                  aria-label="Titolo anime"
+                />
+                <button class="btn btn-gradient" type="submit">Cerca</button>
+              </form>
+            </div>
+
+            <!-- Barra di ricerca -->
+            <div class="ms-lg-5">
+              <a class="btn btn-theme" href="#" onclick="localStorage.removeItem('aw_user');location.reload();" role="button"
+                >Logout</a
+              >
+            </div>
           </div>
         </div>
       </nav>
@@ -69,7 +125,10 @@
       <h1 class="text-center mb-2">📺 La mia lista di Anime</h1>
 
       <section class="space-pd">
-        <div class="d-flex flex-wrap justify-content-center gap-2 mb-5">
+        <div
+          class="d-flex flex-wrap justify-content-center gap-2 mb-5"
+          id="change-state"
+        >
           <a class="btn btn-theme active" href=".show-all" role="button"
             >Tutti</a
           >

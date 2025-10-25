@@ -7,8 +7,13 @@ let animeModal, confirmModal;
 
 const loader = document.getElementById("loader");
 const main = document.getElementById("maincontent");
+var user = { id: 1};
 
 // ==================== INIT ====================
+if (localStorage.getItem("aw_user")) {
+  user = JSON.parse(localStorage.getItem("aw_user"));
+}
+
 if (
   document.getElementById("visti") &&
   document.getElementById("davedere") &&
@@ -19,11 +24,11 @@ if (
     confirmModal = new bootstrap.Modal(document.getElementById("confirmModal"));
 
     // Filtri visualizzazione
-    document.querySelectorAll(".btn-theme").forEach((button) => {
+    document.querySelectorAll("#change-state .btn-theme").forEach((button) => {
       button.addEventListener("click", function (e) {
         e.preventDefault();
         document
-          .querySelectorAll(".btn-theme")
+          .querySelectorAll("#change-state .btn-theme")
           .forEach((btn) => btn.classList.remove("active"));
         this.classList.add("active");
 
@@ -103,6 +108,7 @@ async function loadAnime(forceReload = false) {
     if (!data) {
       const res = await fetch(API_URL);
       data = await res.json();
+      data = data.filter((anime) => Number(anime.utente) === Number(user.id));
       sessionStorage.setItem("animeData", JSON.stringify(data));
     }
 
@@ -167,7 +173,7 @@ async function loadAnime(forceReload = false) {
             <h5 class="card-title">${activeSeason.nome}</h5>
             ${
               group.length > 1
-                ? `<select class="form-select form-select-sm card-season mt-2">${options}</select>`
+                ? `<select class="form-select form-select-sm card-season text-center mt-2">${options}</select>`
                 : ""
             }
           </div>
@@ -276,6 +282,7 @@ async function addAnime() {
       episodi_tot: selectedAnime.episodes || 0,
       data: selectedAnime.aired?.from?.split("T")[0] || "",
       fine: selectedAnime.status || "",
+      utente: user.id || 1,
     };
 
     await postToAPI(payload);
@@ -315,6 +322,7 @@ async function saveAnime() {
       episodi_tot: document.getElementById("modalEpisodiTOT").value.trim(),
       data: document.getElementById("modalData").value.trim(),
       fine: document.getElementById("modalFine").value.trim(),
+      utente: user.id || 1,
     };
 
     await postToAPI(payload);
