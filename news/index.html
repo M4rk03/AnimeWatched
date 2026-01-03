@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>News - Anime Watched</title>
+
+    <script>
+      if (!localStorage.getItem("aw_user")) {
+        window.location.href = "../login/";
+      }
+    </script>
+
+    <link
+      rel="icon"
+      type="image/png"
+      href="../assets/favicon/favicon-96x96.png"
+      sizes="96x96"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="../assets/favicon/favicon.svg"
+    />
+    <link rel="shortcut icon" href="../assets/favicon/favicon.ico" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="../assets/favicon/apple-touch-icon.png"
+    />
+    <meta name="apple-mobile-web-app-title" content="Anime Watched" />
+    <link rel="manifest" href="../assets/favicon/site.webmanifest" />
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../css/style.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <!-- Loader -->
+    <div id="loader">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <header id="header" class="mb-5">
+      <nav
+        class="navbar navbar-expand-lg bg-theme-dark border-bottom"
+        data-bs-theme="dark"
+      >
+        <div
+          class="container-fluid justify-content-around justify-content-sm-between"
+        >
+          <!-- LOGO -->
+          <a class="navbar-brand" href="../">
+            <img src="../assets/logo-AW.png" alt="Anime Watched" width="200" />
+          </a>
+
+          <!-- Bottone hamburger (funziona su mobile) -->
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarAnime"
+            aria-controls="navbarAnime"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <!-- Menu collassabile -->
+          <div class="collapse navbar-collapse" id="navbarAnime">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+              <li class="nav-item active">
+                <a class="nav-link" href="../">Lista Anime</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="../news/">Ultime uscite</a>
+              </li>
+            </ul>
+
+            <!-- Barra di ricerca -->
+            <div class="col-md-5">
+              <form
+                class="d-flex"
+                role="search"
+                action="#"
+                onsubmit="searchAnime(event)"
+                method="post"
+              >
+                <input
+                  class="form-control me-2"
+                  type="search"
+                  id="animeTitle"
+                  placeholder="Titolo anime"
+                  aria-label="Titolo anime"
+                />
+                <button class="btn btn-gradient" type="submit">Cerca</button>
+              </form>
+            </div>
+
+            <!-- Logout -->
+            <div class="ms-lg-5">
+              <a
+                class="btn btn-theme"
+                href="#"
+                onclick="localStorage.removeItem('aw_user');location.reload();"
+                role="button"
+                >Logout</a
+              >
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Risultati ricerca -->
+    <div class="s-overlay">
+      <button
+        type="button"
+        class="btn-close"
+        onclick="this.parentElement.style.display = 'none';"
+        aria-label="Close"
+      ></button>
+      <div
+        id="results"
+        class="container mx-auto mt-5 row gy-4 justify-content-center"
+      ></div>
+    </div>
+
+    <!-- Main -->
+    <main id="maincontent" class="container">
+      <h1 class="text-center mb-2">Uscite Anime settimanali</h1>
+
+      <section class="space-pd">
+        <div
+          class="d-flex flex-wrap justify-content-center gap-2 mb-5"
+          id="change-state"
+        >
+          <a class="btn btn-theme active" href=".all-day" role="button"
+            >Tutti</a
+          >
+          <a class="btn btn-theme" href="#my-list" role="button"
+            >Nella mia lista</a
+          >
+          <a class="btn btn-theme" href="#selection" role="button">Seleziona</a>
+        </div>
+
+        <div class="mb-5">
+          <h2 class="h3 pb-3">Lunedí</h2>
+          <div id="lunedi" class="row g-3"></div>
+        </div>
+
+        <div class="mb-5">
+          <h2 class="h3 pb-3">Marterdí</h2>
+          <div id="martedi" class="row g-3"></div>
+        </div>
+
+        <div class="mb-5">
+          <h2 class="h3 pb-3">Mercoledí</h2>
+          <div id="mercoledi" class="row g-3"></div>
+        </div>
+
+        <div class="mb-5">
+          <h2 class="h3 pb-3">Giovedí</h2>
+          <div id="giovedi" class="row g-3"></div>
+        </div>
+
+        <div class="mb-5">
+          <h2 class="h3 pb-3">Venerdí</h2>
+          <div id="venerdi" class="row g-3"></div>
+        </div>
+
+        <div class="mb-5">
+          <h2 class="h3 pb-3">Sabato</h2>
+          <div id="sabato" class="row g-3"></div>
+        </div>
+
+        <div class="mb-5">
+          <h2 class="h3 pb-3">Domenica</h2>
+          <div id="domenica" class="row g-3"></div>
+        </div>
+      </section>
+
+      <!-- Modal Dettagli Anime -->
+      <div class="modal fade" id="animeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Modifica Anime</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+
+            <div class="modal-body">
+              <div class="row">
+                <div class="text-center">
+                  <img
+                    id="modalImg"
+                    src
+                    class="img-fluid rounded mb-3"
+                    alt="Copertina anime"
+                  />
+                </div>
+
+                <div class="grid-line mb-3">
+                  <label for="modalNome" class="form-label">Nome</label>
+                  <input type="text" id="modalNome" class="form-control" />
+                </div>
+
+                <div class="col-sm-6 mb-3">
+                  <label for="modalCopertina" class="form-label"
+                    >URL Copertina</label
+                  >
+                  <input type="text" id="modalCopertina" class="form-control" />
+                </div>
+
+                <div class="col-sm-6 mb-3">
+                  <label for="modalStato" class="form-label">Stato</label>
+                  <select id="modalStato" class="form-select">
+                    <option value="Visto">✅ Visto</option>
+                    <option value="Da vedere">⏳ Da vedere</option>
+                    <option value="In corso">▶️ In corso</option>
+                  </select>
+                </div>
+
+                <div class="col-sm-6 grid-line gd-col-2 mb-3">
+                  <label for="modalTipo" class="form-label">Tipo</label>
+                  <input
+                    type="text"
+                    id="modalTipo"
+                    class="form-control"
+                    disabled
+                  />
+                </div>
+
+                <div class="col-sm-6 grid-line gd-col-2 mb-3">
+                  <label for="modalStagione" class="form-label">Stagione</label>
+                  <input type="text" id="modalStagione" class="form-control" />
+                </div>
+
+                <div class="grid-line gd-col-3 mb-3">
+                  <label for="modalEpisodi" class="form-label">Episodi</label>
+                  <input
+                    type="number"
+                    id="modalEpisodi"
+                    min="0"
+                    class="form-control"
+                  />
+                  <input
+                    type="number"
+                    id="modalEpisodiTOT"
+                    class="form-control"
+                    disabled
+                  />
+                </div>
+
+                <div class="col-sm-6 mb-3">
+                  <label for="modalData" class="form-label">Data uscita</label>
+                  <input
+                    type="date"
+                    id="modalData"
+                    class="form-control"
+                    disabled
+                  />
+                </div>
+
+                <div class="col-sm-6 mb-3">
+                  <label for="modalFine" class="form-label">Fine</label>
+                  <input type="text" id="modalFine" class="form-control" />
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer justify-content-between">
+              <button class="btn btn-gradient" onclick="updateSavedAnime()">
+                Aggiorna
+              </button>
+              <div>
+                <button class="btn btn-danger me-1" onclick="deleteAnime()">
+                  🗑️ Elimina
+                </button>
+                <button class="btn btn-primary" onclick="saveAnime()">
+                  💾 Salva
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Aggiunta Anime -->
+      <div
+        class="modal fade"
+        id="confirmModal"
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">
+                Confermi di voler aggiungi l'Anime selezionato
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+
+            <div class="modal-body">
+              <div class="text-center">
+                <img
+                  id="confirmImg"
+                  src
+                  class="img-fluid rounded mb-3"
+                  alt="Copertina anime"
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="confirmNome" class="form-label">Nome</label>
+                <input type="text" id="confirmNome" class="form-control" />
+              </div>
+
+              <div class="mb-3">
+                <label for="confirmStato" class="form-label">Stato</label>
+                <select id="confirmStato" class="form-select">
+                  <option value="" selected>-- Seleziona opzione --</option>
+                  <option value="Visto">✅ Visto</option>
+                  <option value="Da vedere">⏳ Da vedere</option>
+                  <option value="In corso">▶️ In corso</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button class="btn btn-danger" onclick="addAnime(false)">
+                🗑️ Annulla
+              </button>
+              <button class="btn btn-primary" onclick="addAnime(true)">
+                💾 Salva
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div
+        id="toastMsg"
+        class="toast align-items-center text-white bg-success border-0"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="d-flex">
+          <div class="toast-body">Anime salvato con successo!</div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+          ></button>
+        </div>
+      </div>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/news.js"></script>
+  </body>
+</html>

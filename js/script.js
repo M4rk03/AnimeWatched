@@ -7,7 +7,7 @@ let animeModal, confirmModal;
 
 const loader = document.getElementById("loader");
 const main = document.getElementById("maincontent");
-var user = { id: 1};
+var user = { id: 1 };
 
 // ==================== INIT ====================
 if (localStorage.getItem("aw_user")) {
@@ -163,7 +163,7 @@ async function loadAnime(forceReload = false) {
         .join("");
 
       div.innerHTML = `
-        <div class="card grid-item h-100">
+        <div class="card grid-item h-100 shadow-sm">
           <div class="cont-img">
             <img src="${activeSeason.copertina}" class="card-img-top" alt="${
         activeSeason.nome
@@ -458,15 +458,17 @@ async function updateSavedAnime() {
   const progressText = document.getElementById("progressText");
 
   try {
-    // Carica anime dal tuo database (Google Sheet)
+    // Carica anime dal database (Google Sheet)
     const res = await fetch(API_URL);
+    if (!res.ok) throw new Error("Impossibile caricare gli anime salvati");
+
     const savedAnime = await res.json();
     const total = savedAnime.length;
     let completed = 0;
     let updatedCount = 0;
 
     // Aggiorna in blocchi (evita rate limit)
-    const chunkSize = 10;
+    const chunkSize = 5;
 
     for (let i = 0; i < total; i += chunkSize) {
       const chunk = savedAnime.slice(i, i + chunkSize);
@@ -476,7 +478,20 @@ async function updateSavedAnime() {
           try {
             if (!anime.id) return;
 
-            // Ottieni dati aggiornati da Jikan API
+            // Skip anime finiti con episodi totali già noti
+            const isFinished = anime.fine?.toLowerCase() === "finished";
+            const totalEpisodesKnown =
+              anime.episodi_tot && anime.episodi_tot > 0;
+            if (isFinished && totalEpisodesKnown) {
+              completed++;
+              const percent = Math.floor((completed / total) * 100);
+              progressBar.style.width = percent + "%";
+              progressBar.textContent = percent + "%";
+              progressText.textContent = `Aggiornamento ${completed}/${total} anime...`;
+              return;
+            }
+
+            // Anime non finito o senza episodi totali → chiama API
             const apiRes = await fetch(
               `https://api.jikan.moe/v4/anime/${anime.id}`
             );
@@ -484,10 +499,9 @@ async function updateSavedAnime() {
             const apiAnime = apiData.data;
             if (!apiAnime) return;
 
-            // Controlla differenze
             const changed =
-              anime.episodi_tot != apiAnime.episodes ||
-              anime.fine != apiAnime.status;
+              Number(anime.episodi_tot) !== Number(apiAnime.episodes) ||
+              anime.fine !== apiAnime.status;
 
             if (changed) {
               updatedCount++;
@@ -495,7 +509,7 @@ async function updateSavedAnime() {
               const payload = {
                 action: "update",
                 id: anime.id,
-                nome: anime.come,
+                nome: anime.nome,
                 copertina: anime.copertina,
                 stato: anime.stato,
                 tipo: anime.tipo,
@@ -529,12 +543,15 @@ async function updateSavedAnime() {
       );
 
       // Pausa per non sovraccaricare l’API
-      await new Promise((r) => setTimeout(r, 3000));
+      await new Promise((r) => setTimeout(r, 2000));
     }
 
     progressText.textContent = `✅ Aggiornamento completato: ${updatedCount} anime aggiornati su ${total}`;
     showToast(`✅ Aggiornati ${updatedCount} anime!`);
     await loadAnime(true);
+
+    // Timeout per far vedere il risultato prima di rimuovere la barra
+    await new Promise((r) => setTimeout(r, 2000));
   } catch (err) {
     console.error("Errore aggiornamento anime:", err);
     showToast("❌ Errore durante l'aggiornamento", "danger");
