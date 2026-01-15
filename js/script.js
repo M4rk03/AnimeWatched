@@ -543,7 +543,7 @@ async function updateSavedAnime() {
       );
 
       // Pausa per non sovraccaricare l’API
-      await new Promise((r) => setTimeout(r, 2000));
+      await new Promise((r) => setTimeout(r, 3000));
     }
 
     progressText.textContent = `✅ Aggiornamento completato: ${updatedCount} anime aggiornati su ${total}`;

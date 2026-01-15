@@ -117,7 +117,7 @@ function success(access, msg) {
       })
     );
 
-    setTimeout(() => (window.location.href = "index.html"), 1000);
+    setTimeout(() => (window.location.href = "../"), 1000);
   } else {
     err("Credenziali non valide.");
   }
