@@ -123,7 +123,7 @@ async function loadAnime(forceReload = false) {
 
     // ordina gruppi per il nome del primo anime
     const groupedArray = Object.values(grouped).sort((a, b) =>
-      a[0].nome.localeCompare(b[0].nome)
+      a[0].nome.localeCompare(b[0].nome),
     );
 
     Object.values(groupedArray).forEach((group) => {
@@ -155,10 +155,10 @@ async function loadAnime(forceReload = false) {
                   ? "" + s.stagione
                   : 0
                 : s.stagione
-                ? "S" + s.stagione
-                : 0
+                  ? "S" + s.stagione
+                  : 0
             }
-          </option>`
+          </option>`,
         )
         .join("");
 
@@ -166,8 +166,8 @@ async function loadAnime(forceReload = false) {
         <div class="card grid-item h-100 shadow-sm">
           <div class="cont-img">
             <img src="${activeSeason.copertina}" class="card-img-top" alt="${
-        activeSeason.nome
-      }">
+              activeSeason.nome
+            }">
           </div>
           <div class="card-body p-2">
             <h5 class="card-title">${activeSeason.nome}</h5>
@@ -361,6 +361,52 @@ async function deleteAnime() {
   }
 }
 
+// ==================== SELECT IMAGE ANIME ====================
+async function selectImgAnime(event) {
+  event.preventDefault();
+  if (!selectedAnime) return;
+
+  const url = `https://api.jikan.moe/v4/anime/${selectedAnime.id}/pictures`;
+  const container = document.getElementById("all-images");
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    container.innerHTML = "";
+    data.data.forEach((anime) =>
+      container.appendChild(createImagesCard(anime)),
+    );
+    container.classList.add("open");
+    container.parentElement.style.display = "block";
+  } catch (err) {
+    console.error(err);
+    showToast("Errore durante la ricerca anime", "danger");
+  }
+}
+
+function createImagesCard(anime) {
+  const card = document.createElement("div");
+  card.className = "col-auto";
+
+  card.innerHTML = `
+    <div class="card search-item">
+      <div class="search-img text-center">
+        <a onclick="imgSelect('${anime.jpg?.image_url}')">
+          <img src="${anime.jpg?.image_url}" alt="${selectedAnime.title}">
+        </a>
+      </div>
+    </div>
+  `;
+
+  return card;
+}
+
+function imgSelect(img) {
+  document.getElementById("modalImg").src = img;
+  document.getElementById("modalCopertina").value = img;
+  document.getElementById("all-images").parentElement.style.display = "none";
+}
+
 // ==================== SEARCH ====================
 async function searchAnime(event) {
   event.preventDefault();
@@ -375,7 +421,7 @@ async function searchAnime(event) {
     const data = await response.json();
     container.innerHTML = "";
     data.data.forEach((anime) =>
-      container.appendChild(createSearchCard(anime))
+      container.appendChild(createSearchCard(anime)),
     );
     container.classList.add("open");
     container.parentElement.style.display = "block";
@@ -466,6 +512,7 @@ async function updateSavedAnime() {
     const total = savedAnime.length;
     let completed = 0;
     let updatedCount = 0;
+    console.log(`Aggiornamento di ${total} anime iniziato...`);
 
     // Aggiorna in blocchi (evita rate limit)
     const chunkSize = 5;
@@ -479,21 +526,15 @@ async function updateSavedAnime() {
             if (!anime.id) return;
 
             // Skip anime finiti con episodi totali già noti
-            const isFinished = anime.fine?.toLowerCase() === "finished";
+            const isFinished = anime.fine?.toLowerCase() === "finished airing";
             const totalEpisodesKnown =
               anime.episodi_tot && anime.episodi_tot > 0;
-            if (isFinished && totalEpisodesKnown) {
-              completed++;
-              const percent = Math.floor((completed / total) * 100);
-              progressBar.style.width = percent + "%";
-              progressBar.textContent = percent + "%";
-              progressText.textContent = `Aggiornamento ${completed}/${total} anime...`;
-              return;
-            }
+
+            if (isFinished && totalEpisodesKnown) return;
 
             // Anime non finito o senza episodi totali → chiama API
             const apiRes = await fetch(
-              `https://api.jikan.moe/v4/anime/${anime.id}`
+              `https://api.jikan.moe/v4/anime/${anime.id}`,
             );
             const apiData = await apiRes.json();
             const apiAnime = apiData.data;
@@ -501,8 +542,9 @@ async function updateSavedAnime() {
 
             const changed =
               Number(anime.episodi_tot) !== Number(apiAnime.episodes) ||
-              anime.fine !== apiAnime.status;
-
+              anime.fine !== apiAnime.status ||
+              anime.data !== apiAnime.aired?.from?.split("T")[0];
+              
             if (changed) {
               updatedCount++;
 
@@ -539,11 +581,11 @@ async function updateSavedAnime() {
             progressBar.textContent = percent + "%";
             progressText.textContent = `Aggiornamento ${completed}/${total} anime...`;
           }
-        })
+        }),
       );
 
       // Pausa per non sovraccaricare l’API
-      await new Promise((r) => setTimeout(r, 3000));
+      await new Promise((r) => setTimeout(r, 2000));
     }
 
     progressText.textContent = `✅ Aggiornamento completato: ${updatedCount} anime aggiornati su ${total}`;

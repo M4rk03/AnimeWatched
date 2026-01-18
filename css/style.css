@@ -22,7 +22,7 @@ body {
 }
 
 a {
- transition: 0.3s;
+  transition: 0.3s;
 }
 
 img {
@@ -205,6 +205,7 @@ body::-webkit-scrollbar-thumb:hover {
   max-width: 200px;
   margin: auto;
   overflow: hidden;
+  cursor: pointer;
 
   & .cont-img {
     overflow: hidden;
@@ -263,6 +264,10 @@ body::-webkit-scrollbar-thumb:hover {
   }
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
+
 /* List anime search */
 #results {
   max-height: 0;
@@ -282,7 +287,8 @@ body::-webkit-scrollbar-thumb:hover {
   }
 }
 
-.s-overlay {
+.s-overlay,
+.i-overlay {
   display: none;
   position: fixed;
   content: "";
@@ -326,4 +332,30 @@ body::-webkit-scrollbar-thumb:hover {
     display: block;
     padding: 2px 0;
   }
+}
+
+/* List anime search */
+#all-images {
+  max-width: 38%;
+  max-height: 90vh;
+  overflow: hidden auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 10px 5px #0003;
+  background-color: var(--bs-body);
+  padding: 12px 12px 32px;
+  margin-right: 20px !important;
+  transition: all 0.2s;
+  z-index: 99;
+
+  & .card {
+    overflow: hidden;
+  }
+
+  & .search-img img {
+    max-height: 270px;
+  }
+}
+
+.i-overlay {
+  z-index: 9999;
 }
