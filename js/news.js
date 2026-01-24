@@ -21,8 +21,8 @@ function convertToItalyTime(timeJP) {
       now.getUTCMonth(),
       now.getUTCDate(),
       hour - 9,
-      minute
-    )
+      minute,
+    ),
   );
 
   return tokyoUTC.toLocaleTimeString("it-IT", {
@@ -38,7 +38,7 @@ function createAnimeCard(anime) {
   col.className = "col-lg-2 col-md-3 col-sm-4 col-6 all-day";
 
   const image = anime.images?.jpg?.image_url ?? "";
-  const title = anime.title;
+  const title = anime.title_english ?? anime.title;
   const timeJP = anime.broadcast?.time;
 
   let timeIT = "Orario N/D";
@@ -62,6 +62,10 @@ function createAnimeCard(anime) {
 }
 
 // ==================== DATA ====================
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function fetchAllSchedules() {
   let page = 1;
   let allAnime = [];
@@ -69,15 +73,42 @@ async function fetchAllSchedules() {
 
   while (hasNext) {
     const res = await fetch(`https://api.jikan.moe/v4/schedules?page=${page}`);
+
+    if (!res.ok) {
+      console.warn("Jikan rate limit o errore, page:", page);
+      break;
+    }
+
     const json = await res.json();
 
-    allAnime = allAnime.concat(json.data);
+    if (!json.pagination) {
+      console.warn("Pagination mancante, stop");
+      break;
+    }
+
+    allAnime.push(...json.data);
 
     hasNext = json.pagination.has_next_page;
     page++;
+
+    await sleep(800); // evita rate limit
   }
 
   return allAnime;
+}
+
+function durationToMinutes(duration) {
+  if (!duration) return 0;
+
+  let minutes = 0;
+
+  const hourMatch = duration.match(/(\d+)\s*hr/);
+  const minMatch = duration.match(/(\d+)\s*min/);
+
+  if (hourMatch) minutes += parseInt(hourMatch[1], 10) * 60;
+  if (minMatch) minutes += parseInt(minMatch[1], 10);
+
+  return minutes;
 }
 
 async function loadWeeklyAnime() {
@@ -96,13 +127,16 @@ async function loadWeeklyAnime() {
     const animeList = await fetchAllSchedules();
 
     animeList.forEach((anime) => {
+      const durationMin = durationToMinutes(anime.duration);
+
+      if (durationMin <= 3) return;
+
       const day = anime.broadcast?.day;
-      const key = dayMap[day];
-      if (key) buckets[key].push(anime);
+      const key = dayMap[day] ?? "generic";
+      buckets[key].push(anime);
     });
 
     for (const [key, list] of Object.entries(buckets)) {
-      // ordina per orario
       list.sort((a, b) => {
         const t1 = a.broadcast?.time ?? "99:99";
         const t2 = b.broadcast?.time ?? "99:99";
@@ -110,10 +144,12 @@ async function loadWeeklyAnime() {
       });
 
       const container = document.getElementById(key);
+      if (!container) continue;
+
       list.forEach((anime) => container.appendChild(createAnimeCard(anime)));
     }
   } catch (err) {
-    console.error(err);
+    console.error("Errore generale:", err);
   }
 }
 
