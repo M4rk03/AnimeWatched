@@ -3,7 +3,7 @@ const API_URL =
   "https://script.google.com/macros/s/AKfycby8ZsgjY-2TdqjwQ5RKjNNe1A6dt62o4P2cGjYG_wszOwRd9dNlcfeNgjHx2DQuFalzFw/exec";
 
 let selectedAnime = null;
-let animeModal, confirmModal;
+let animeModal, confirmModal, upgradeModal;
 
 const loader = document.getElementById("loader");
 const main = document.getElementById("maincontent");
@@ -22,6 +22,7 @@ if (
   document.addEventListener("DOMContentLoaded", () => {
     animeModal = new bootstrap.Modal(document.getElementById("animeModal"));
     confirmModal = new bootstrap.Modal(document.getElementById("confirmModal"));
+    upgradeModal = new bootstrap.Modal(document.getElementById("upgradeModal"));
 
     // Filtri visualizzazione
     document.querySelectorAll("#change-state .btn-theme").forEach((button) => {
@@ -45,6 +46,7 @@ if (
     });
   });
   loadAnime();
+  checkUpgrades();
 } else {
   toggleLoader(false);
 }
@@ -377,7 +379,7 @@ async function selectImgAnime(event) {
       container.appendChild(createImagesCard(anime)),
     );
     container.classList.add("open");
-    container.parentElement.style.display = "block";
+    container.parentElement.parentElement.style.display = "block";
   } catch (err) {
     console.error(err);
     showToast("Errore durante la ricerca anime", "danger");
@@ -404,7 +406,9 @@ function createImagesCard(anime) {
 function imgSelect(img) {
   document.getElementById("modalImg").src = img;
   document.getElementById("modalCopertina").value = img;
-  document.getElementById("all-images").parentElement.style.display = "none";
+  document.getElementById(
+    "all-images",
+  ).parentElement.parentElement.style.display = "none";
 }
 
 // ==================== SEARCH ====================
@@ -544,7 +548,7 @@ async function updateSavedAnime() {
               Number(anime.episodi_tot) !== Number(apiAnime.episodes) ||
               anime.fine !== apiAnime.status ||
               anime.data !== apiAnime.aired?.from?.split("T")[0];
-              
+
             if (changed) {
               updatedCount++;
 
@@ -603,4 +607,146 @@ async function updateSavedAnime() {
     toggleLoader(false);
     progressContainer.remove();
   }
+}
+
+// ==================== UPGRADE EPISODI ANIME ====================
+let pendingUpdates = [];
+
+async function checkUpgrades() {
+  try {
+    const res = await fetch(`${API_URL}?action=upgrade`);
+    const data = await res.json();
+
+    pendingUpdates = data.upgrades || [];
+
+    const btn = document.getElementById("btnUpgrade");
+
+    if (pendingUpdates.length > 0) {
+      btn.parentElement.style.display = "block";
+    } else {
+      btn.parentElement.style.display = "none";
+    }
+  } catch (err) {
+    console.error("Errore check aggiornamenti:", err);
+  }
+}
+
+// =============================
+// Apri modal
+// =============================
+function apriNotifiche() {
+  const lista = document.getElementById("lista-aggiornamenti");
+
+  lista.innerHTML = "";
+
+  if (pendingUpdates.length === 0) {
+    lista.innerHTML =
+      '<p style="color:#888; text-align:center;">Nessun aggiornamento 🎉</p>';
+    upgradeModal.show();
+    return;
+  }
+
+  pendingUpdates.forEach((upd, i) => {
+    const card = document.createElement("div");
+    card.className = "update-card";
+    card.innerHTML = `
+      <input type="checkbox" id="upd-${i}" checked data-index="${i}">
+      <div class="update-info">
+        <div class="update-nome">${upd.nome}</div>
+        <div class="update-ep">📺 Episodio ${upd.episodio}</div>
+        <div class="update-data">📅 ${formatData(upd.data)}</div>
+      </div>
+    `;
+
+    // Toggle selezione visiva
+    const checkbox = card.querySelector("input");
+    checkbox.addEventListener("change", () => {
+      card.classList.toggle("selected", checkbox.checked);
+    });
+    card.classList.add("selected"); // selezionato di default
+
+    lista.appendChild(card);
+  });
+
+  upgradeModal.show();
+}
+
+function chiudiNotifiche() {
+  upgradeModal.hide();
+}
+
+// Chiudi cliccando fuori
+upgradeModal?.addEventListener("click", (e) => {
+  if (e.target.classList.contains("modal-overlay")) chiudiNotifiche();
+});
+
+// =============================
+// Conferma / Rifiuta
+// =============================
+function getSelezionati() {
+  const checkboxes = document.querySelectorAll(
+    ".update-card input[type='checkbox']",
+  );
+  const selected = [];
+  checkboxes.forEach((cb) => {
+    if (cb.checked) {
+      selected.push(pendingUpdates[cb.dataset.index]);
+    }
+  });
+  return selected;
+}
+
+async function confermaSelezionati() {
+  const selezionati = getSelezionati();
+  if (selezionati.length === 0) return;
+
+  for (const upd of selezionati) {
+    await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "confirmUpdate",
+        id: upd.id,
+        episodio: upd.episodio,
+      }),
+    });
+  }
+
+  chiudiNotifiche();
+  checkUpdates(); // ricontrolla
+  // Se hai una funzione per ricaricare la lista anime:
+  // loadAnimeList();
+}
+
+async function rifiutaSelezionati() {
+  const selezionati = getSelezionati();
+  if (selezionati.length === 0) return;
+
+  for (const upd of selezionati) {
+    await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "dismissUpdate",
+        id: upd.id,
+        episodio: upd.episodio,
+      }),
+    });
+  }
+
+  chiudiNotifiche();
+  checkUpdates();
+}
+
+// =============================
+// Utility
+// =============================
+function formatData(data) {
+  if (!data) return "";
+  const d = new Date(data);
+  return d.toLocaleDateString("it-IT", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
@@ -100,7 +100,10 @@
               <a
                 class="btn btn-theme"
                 href="#"
-                onclick="localStorage.removeItem('aw_user');location.reload();"
+                onclick="
+                  localStorage.removeItem('aw_user');
+                  location.reload();
+                "
                 role="button"
                 >Logout</a
               >
@@ -115,7 +118,7 @@
       <button
         type="button"
         class="btn-close"
-        onclick="this.parentElement.style.display = 'none';"
+        onclick="this.parentElement.style.display = 'none'"
         aria-label="Close"
       ></button>
       <div
@@ -329,18 +332,69 @@
         </div>
       </div>
 
-      <!-- Elenco immagini -->
-      <div class="i-overlay">
+      <!-- Elenco Immagini -->
+      <div class="i-overlay" onclick="this.style.display = 'none'">
+        <div class="cont-all-images">
+          <button
+            type="button"
+            class="btn-close"
+            onclick="this.parentElement.parentElement.style.display = 'none'"
+            aria-label="Close"
+          ></button>
+          <div
+            id="all-images"
+            class="container row gy-4 justify-content-center"
+          ></div>
+        </div>
+      </div>
+
+      <!-- Bottone e Modal Aggiornamenti Episodi -->
+      <div class="cont-btn-upgrade">
         <button
-          type="button"
-          class="btn-close"
-          onclick="this.parentElement.style.display = 'none';"
-          aria-label="Close"
-        ></button>
-        <div
-          id="all-images"
-          class="container mx-auto mt-5 row gy-4 justify-content-center"
-        ></div>
+          id="btnUpgrade"
+          class="btn btn-gradient"
+          title="Aggiorna la lista con gli episodi che hai visto"
+          onclick="apriNotifiche()"
+        >
+          Aggiornamenti
+        </button>
+      </div>
+
+      <div
+        class="modal fade"
+        id="upgradeModal"
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Episodi da confermare</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div id="lista-aggiornamenti" class="update-list">
+                <!-- Popolato via JS -->
+              </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button
+                class="btn btn-danger me-1"
+                onclick="rifiutaSelezionati()"
+              >
+                Rifiuta selezionati
+              </button>
+              <button class="btn btn-success" onclick="confermaSelezionati()">
+                Conferma selezionati
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
 
