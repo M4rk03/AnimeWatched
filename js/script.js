@@ -4,6 +4,7 @@ const API_URL =
 
 let selectedAnime = null;
 let animeModal, confirmModal, upgradeModal;
+let pendingUpdates = [];
 
 const loader = document.getElementById("loader");
 const main = document.getElementById("maincontent");
@@ -46,7 +47,7 @@ if (
     });
   });
   loadAnime();
-  checkUpgrades();
+  if (user.id == 1) checkUpgrades();
 } else {
   toggleLoader(false);
 }
@@ -64,6 +65,18 @@ function setDate(d) {
     day: "numeric",
     month: "long",
     year: "numeric",
+  });
+}
+
+function setDateTime(data) {
+  if (!data) return "";
+  const d = new Date(data);
+  return d.toLocaleDateString("it-IT", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
@@ -254,6 +267,43 @@ function openConfirmModal(anime) {
     anime.images?.jpg?.image_url || "";
   document.getElementById("confirmStato").selectedIndex = 0;
   confirmModal.show();
+}
+
+function openUpgradeModal() {
+  const lista = document.getElementById("lista-aggiornamenti");
+
+  lista.innerHTML = "";
+
+  if (pendingUpdates.length === 0) {
+    lista.innerHTML =
+      '<p style="color:#888; text-align:center;">Nessun aggiornamento 🎉</p>';
+    upgradeModal.show();
+    return;
+  }
+
+  pendingUpdates.forEach((upd, i) => {
+    const card = document.createElement("div");
+    card.className = "update-card";
+    card.innerHTML = `
+      <input type="checkbox" id="upd-${i}" checked data-index="${i}">
+      <div class="update-info">
+        <div class="update-nome">${upd.nome}</div>
+        <div class="update-ep">📺 Episodio ${upd.episodio}</div>
+        <div class="update-data">📅 ${setDateTime(upd.data)}</div>
+      </div>
+    `;
+
+    // Toggle selezione visiva
+    const checkbox = card.querySelector("input");
+    checkbox.addEventListener("change", () => {
+      card.classList.toggle("selected", checkbox.checked);
+    });
+    card.classList.add("selected"); // selezionato di default
+
+    lista.appendChild(card);
+  });
+
+  upgradeModal.show();
 }
 
 // ==================== ADD / SAVE / DELETE ====================
@@ -610,8 +660,6 @@ async function updateSavedAnime() {
 }
 
 // ==================== UPGRADE EPISODI ANIME ====================
-let pendingUpdates = [];
-
 async function checkUpgrades() {
   try {
     const res = await fetch(`${API_URL}?action=upgrade`);
@@ -632,58 +680,9 @@ async function checkUpgrades() {
 }
 
 // =============================
-// Apri modal
-// =============================
-function apriNotifiche() {
-  const lista = document.getElementById("lista-aggiornamenti");
-
-  lista.innerHTML = "";
-
-  if (pendingUpdates.length === 0) {
-    lista.innerHTML =
-      '<p style="color:#888; text-align:center;">Nessun aggiornamento 🎉</p>';
-    upgradeModal.show();
-    return;
-  }
-
-  pendingUpdates.forEach((upd, i) => {
-    const card = document.createElement("div");
-    card.className = "update-card";
-    card.innerHTML = `
-      <input type="checkbox" id="upd-${i}" checked data-index="${i}">
-      <div class="update-info">
-        <div class="update-nome">${upd.nome}</div>
-        <div class="update-ep">📺 Episodio ${upd.episodio}</div>
-        <div class="update-data">📅 ${formatData(upd.data)}</div>
-      </div>
-    `;
-
-    // Toggle selezione visiva
-    const checkbox = card.querySelector("input");
-    checkbox.addEventListener("change", () => {
-      card.classList.toggle("selected", checkbox.checked);
-    });
-    card.classList.add("selected"); // selezionato di default
-
-    lista.appendChild(card);
-  });
-
-  upgradeModal.show();
-}
-
-function chiudiNotifiche() {
-  upgradeModal.hide();
-}
-
-// Chiudi cliccando fuori
-upgradeModal?.addEventListener("click", (e) => {
-  if (e.target.classList.contains("modal-overlay")) chiudiNotifiche();
-});
-
-// =============================
 // Conferma / Rifiuta
 // =============================
-function getSelezionati() {
+function getSelectedUpgrades() {
   const checkboxes = document.querySelectorAll(
     ".update-card input[type='checkbox']",
   );
@@ -696,29 +695,51 @@ function getSelezionati() {
   return selected;
 }
 
-async function confermaSelezionati() {
-  const selezionati = getSelezionati();
+async function confirmSelectedUpgrades() {
+  const selezionati = getSelectedUpgrades();
   if (selezionati.length === 0) return;
 
+  // Raggruppa per ID e tieni solo l'episodio più alto
+  const grouped = {};
   for (const upd of selezionati) {
-    await fetch(SCRIPT_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        action: "confirmUpdate",
-        id: upd.id,
-        episodio: upd.episodio,
-      }),
-    });
+    const id = String(upd.id);
+    if (!grouped[id] || Number(upd.episodio) > Number(grouped[id].episodio)) {
+      grouped[id] = upd;
+    }
   }
 
-  chiudiNotifiche();
-  checkUpdates(); // ricontrolla
-  // Se hai una funzione per ricaricare la lista anime:
-  // loadAnimeList();
+  toggleLoader(true);
+
+  try {
+    // Invia una sola richiesta per anime, con l'episodio più alto
+    for (const id in grouped) {
+      const upd = grouped[id];
+
+      const payload = {
+        action: "confirmUpgrade",
+        id: upd.id,
+        episodio: upd.episodio,
+        utente: user.id || 1,
+      };
+
+      await postToAPI(payload);
+    }
+
+    sessionStorage.removeItem("animeData");
+    await loadAnime(true);
+    showToast("Episodi aggiornati!");
+  } catch (err) {
+    console.error(err);
+    showToast("Errore durante l'aggiornamento degli episodi");
+  } finally {
+    toggleLoader(false);
+    upgradeModal.hide();
+    checkUpgrades();
+  }
 }
 
-async function rifiutaSelezionati() {
-  const selezionati = getSelezionati();
+async function rejectSelectedUpgrades() {
+  const selezionati = getSelectedUpgrades();
   if (selezionati.length === 0) return;
 
   for (const upd of selezionati) {
@@ -732,21 +753,6 @@ async function rifiutaSelezionati() {
     });
   }
 
-  chiudiNotifiche();
+  upgradeModal.hide();
   checkUpdates();
-}
-
-// =============================
-// Utility
-// =============================
-function formatData(data) {
-  if (!data) return "";
-  const d = new Date(data);
-  return d.toLocaleDateString("it-IT", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 }

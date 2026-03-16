@@ -354,7 +354,7 @@
           id="btnUpgrade"
           class="btn btn-gradient"
           title="Aggiorna la lista con gli episodi che hai visto"
-          onclick="apriNotifiche()"
+          onclick="openUpgradeModal()"
         >
           Aggiornamenti
         </button>
@@ -385,11 +385,11 @@
             <div class="modal-footer justify-content-between">
               <button
                 class="btn btn-danger me-1"
-                onclick="rifiutaSelezionati()"
+                onclick="rejectSelectedUpgrades()"
               >
                 Rifiuta selezionati
               </button>
-              <button class="btn btn-success" onclick="confermaSelezionati()">
+              <button class="btn btn-success" onclick="confirmSelectedUpgrades()">
                 Conferma selezionati
               </button>
             </div>
