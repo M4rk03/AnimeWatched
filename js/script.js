@@ -742,17 +742,24 @@ async function rejectSelectedUpgrades() {
   const selezionati = getSelectedUpgrades();
   if (selezionati.length === 0) return;
 
-  for (const upd of selezionati) {
-    await fetch(SCRIPT_URL, {
-      method: "POST",
-      body: JSON.stringify({
+  toggleLoader(true);
+
+  try {
+    for (const upd of selezionati) {
+      await postToAPI({
         action: "dismissUpdate",
         id: upd.id,
         episodio: upd.episodio,
-      }),
-    });
-  }
+      });
+    }
 
-  upgradeModal.hide();
-  checkUpdates();
+    showToast("Episodi rifiutati");
+  } catch (err) {
+    console.error(err);
+    showToast("Errore durante il rifiuto degli episodi");
+  } finally {
+    toggleLoader(false);
+    upgradeModal.hide();
+    checkUpgrades();
+  }
 }
