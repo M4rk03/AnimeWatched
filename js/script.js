@@ -366,7 +366,7 @@ async function saveAnime() {
       stato: document.getElementById("modalStato").value.trim(),
       tipo: document.getElementById("modalTipo").value.trim(),
       stagione: document.getElementById("modalStagione").value.trim(),
-      stagione_id: selectedAnime.stagione_id || "",
+      stagione_id: selectedAnime.stagione_id || 0,
       episodi:
         document.getElementById("modalStato").value.trim() === "Visto"
           ? document.getElementById("modalEpisodiTOT").value.trim()
@@ -679,9 +679,6 @@ async function checkUpgrades() {
   }
 }
 
-// =============================
-// Conferma / Rifiuta
-// =============================
 function getSelectedUpgrades() {
   const checkboxes = document.querySelectorAll(
     ".update-card input[type='checkbox']",
@@ -747,7 +744,7 @@ async function rejectSelectedUpgrades() {
   try {
     for (const upd of selezionati) {
       await postToAPI({
-        action: "dismissUpdate",
+        action: "dismissUpgrade",
         id: upd.id,
         episodio: upd.episodio,
       });
