@@ -331,7 +331,7 @@ async function addAnime() {
       stato,
       tipo: selectedAnime.type || "",
       episodi: stato === "Visto" ? selectedAnime.episodes : 0,
-      episodi_tot: selectedAnime.episodes || 0,
+      episodi_tot: selectedAnime.episodes || "",
       data: selectedAnime.aired?.from?.split("T")[0] || "",
       fine: selectedAnime.status || "",
       utente: user.id || 1,
@@ -398,7 +398,7 @@ async function deleteAnime() {
   let message = "";
 
   try {
-    const payload = { action: "delete", id: selectedAnime.id };
+    const payload = { action: "delete", id: selectedAnime.id, utente: user.id };
     await postToAPI(payload);
     animeModal.hide();
     sessionStorage.removeItem("animeData");
@@ -563,7 +563,8 @@ async function updateSavedAnime() {
     if (!res.ok) throw new Error("Impossibile caricare gli anime salvati");
 
     const savedAnime = await res.json();
-    const total = savedAnime.length;
+    const savedAnimeUser = savedAnime.filter((anime) => Number(anime.utente) === Number(user.id));
+    const total = savedAnimeUser.length;
     let completed = 0;
     let updatedCount = 0;
     console.log(`Aggiornamento di ${total} anime iniziato...`);
@@ -572,7 +573,7 @@ async function updateSavedAnime() {
     const chunkSize = 5;
 
     for (let i = 0; i < total; i += chunkSize) {
-      const chunk = savedAnime.slice(i, i + chunkSize);
+      const chunk = savedAnimeUser.slice(i, i + chunkSize);
 
       await Promise.all(
         chunk.map(async (anime) => {
@@ -613,8 +614,9 @@ async function updateSavedAnime() {
                 stagione_id: anime.stagione_id,
                 episodi: apiAnime.episodes_aired ?? anime.episodi,
                 episodi_tot: apiAnime.episodes ?? anime.episodi_tot,
-                data: apiAnime.aired?.from ?? anime.data,
+                data: apiAnime.aired?.from?.split("T")[0] ?? anime.data,
                 fine: apiAnime.status ?? anime.fine,
+                utente: anime.utente,
               };
 
               await fetch(API_URL, {
