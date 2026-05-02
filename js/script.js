@@ -239,7 +239,6 @@ function openModal(anime) {
   const fields = {
     modalNome: anime.nome,
     modalImg: anime.copertina || "./assets/default.png",
-    modalCopertina: anime.copertina || "",
     modalStato: anime.stato,
     modalTipo: anime.tipo,
     modalStagione: anime.stagione,
@@ -362,7 +361,7 @@ async function saveAnime() {
       action: "update",
       id: selectedAnime.id,
       nome: document.getElementById("modalNome").value.trim(),
-      copertina: document.getElementById("modalCopertina").value.trim(),
+      copertina: document.getElementById("modalImg").src,
       stato: document.getElementById("modalStato").value.trim(),
       tipo: document.getElementById("modalTipo").value.trim(),
       stagione: document.getElementById("modalStagione").value.trim(),
@@ -455,7 +454,6 @@ function createImagesCard(anime) {
 
 function imgSelect(img) {
   document.getElementById("modalImg").src = img;
-  document.getElementById("modalCopertina").value = img;
   document.getElementById(
     "all-images",
   ).parentElement.parentElement.style.display = "none";
@@ -487,7 +485,7 @@ async function searchAnime(event) {
 
 function createSearchCard(anime) {
   const card = document.createElement("div");
-  card.className = "col-md-10 col-lg-6";
+  card.className = "col-md-6 col-lg-4 px-2";
 
   const title = anime.title_english ?? anime.title;
   const year = anime.year ?? "?";
@@ -498,12 +496,12 @@ function createSearchCard(anime) {
   const synopsis = anime.synopsis ?? "";
 
   card.innerHTML = `
-    <div class="card search-item">
-      <div class="d-grid align-items-center mb-2">
+    <div class="card search-item p-2">
+      <div class="d-grid align-items-center">
         <div class="search-img text-center">
           <img src="${anime.images?.jpg?.image_url}" alt="${title}">
         </div>
-        <div class="search-body p-2">
+        <div class="search-body">
           <h3 class="card-title text-start mb-3">${title} (${year})</h3>
           <ul class="list-group">
             <li><b>Tipo:</b> ${type}</li>
@@ -511,20 +509,20 @@ function createSearchCard(anime) {
             <li><b>Stato:</b> ${status}</li>
             <li><b>Data:</b> ${date}</li>
           </ul>
+          <div class="search-desc pt-3">
+            <button class="btn btn-link p-0" data-bs-toggle="collapse"
+                    data-bs-target="#collapse${anime.mal_id}"
+                    aria-expanded="false" aria-controls="collapse${anime.mal_id}">
+              <b>Trama</b>
+            </button>
+            <div style="float: right;">
+              <button class="btn btn-gradient btn-save">Salva</button>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="search-desc p-2">
-        <button class="btn btn-link p-0" data-bs-toggle="collapse"
-                data-bs-target="#collapse${anime.mal_id}"
-                aria-expanded="false" aria-controls="collapse${anime.mal_id}">
-          <b>Trama</b>
-        </button>
-        <div id="collapse${anime.mal_id}" class="collapse">
-          <div class="py-2">${synopsis}</div>
-        </div>
-        <div style="float: right;">
-          <button class="btn btn-gradient btn-save">Salva</button>
-        </div>
+      <div id="collapse${anime.mal_id}" class="collapse mt-2">
+        <div class="p-2">${synopsis}</div>
       </div>
     </div>
   `;

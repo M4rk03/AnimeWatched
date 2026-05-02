@@ -23,8 +23,9 @@ body {
   color: var(--bs-text);
 }
 
-a {
-  transition: 0.3s;
+a,
+button {
+  transition: all 0.3s;
 }
 
 img {
@@ -101,7 +102,7 @@ body::-webkit-scrollbar-thumb:hover {
   }
 }
 
-/* Barra di progresso */
+/* --- Barra di progresso --- */
 #progressContainer {
   position: fixed;
   bottom: 20px;
@@ -117,16 +118,21 @@ body::-webkit-scrollbar-thumb:hover {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
 }
 
-/* Header */
+/* --- Header --- */
 .bg-theme-dark {
   background-color: var(--bs-dark);
+}
+
+#header .navbar-nav .nav-link {
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 .navbar .form-control {
   background-color: var(--bs-body);
 }
 
-/* Form */
+/* --- Form --- */
 .form-control,
 .form-select {
   background-color: #0c0d12;
@@ -170,7 +176,15 @@ body::-webkit-scrollbar-thumb:hover {
   }
 }
 
-/* Popup */
+.btn-link {
+  color: var(--bs-primary);
+
+  &:hover {
+    color: var(--bs-third);
+  }
+}
+
+/* --- Popup --- */
 .modal-content {
   background-color: #0f111a;
 }
@@ -202,7 +216,7 @@ body::-webkit-scrollbar-thumb:hover {
   }
 }
 
-/* Container cards */
+/* --- Container cards --- */
 .grid-item.card {
   display: grid;
   grid-template-rows: auto 1fr;
@@ -213,15 +227,19 @@ body::-webkit-scrollbar-thumb:hover {
 
   & .cont-img {
     overflow: hidden;
+  }
+
+  & .cont-img img {
+    object-fit: cover;
     aspect-ratio: 260 / 362;
   }
 }
 
-/* Cards anime */
+/* --- Cards anime --- */
 .card {
   background-color: #14161f;
   border: none;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.2s;
   position: relative;
 
   &:hover {
@@ -272,7 +290,7 @@ body::-webkit-scrollbar-thumb:hover {
   cursor: pointer;
 }
 
-/* List anime search */
+/* --- List anime search --- */
 #results {
   max-height: 0;
   overflow: hidden auto;
@@ -321,7 +339,7 @@ body::-webkit-scrollbar-thumb:hover {
 
   & .d-grid {
     grid-template-columns: 1fr 2fr;
-    gap: 10px;
+    gap: 16px;
   }
 
   & .card-title,
@@ -330,7 +348,7 @@ body::-webkit-scrollbar-thumb:hover {
   }
 
   & .search-img img {
-    max-height: 100px;
+    max-height: 200px;
   }
 
   & .list-group li {
@@ -339,7 +357,7 @@ body::-webkit-scrollbar-thumb:hover {
   }
 }
 
-/* Section change images */
+/* --- Section change images --- */
 .cont-all-images {
   position: absolute;
   bottom: 18px;
@@ -388,7 +406,7 @@ body::-webkit-scrollbar-thumb:hover {
   }
 }
 
-/* Upgrades (Btn - Modal - Cards) */
+/* --- UPGRADES (Btn - Modal - Cards) --- */
 .cont-btn-upgrade {
   display: none;
   position: fixed;
@@ -420,10 +438,7 @@ body::-webkit-scrollbar-thumb:hover {
   max-height: 90vh;
 }
 
-
-/* ======== */
-
-/* --- LISTA AGGIORNAMENTI --- */
+/* --- UPGRADES LIST --- */
 .update-list {
   overflow-y: auto;
   padding: 12px 20px;
@@ -439,7 +454,7 @@ body::-webkit-scrollbar-thumb:hover {
   display: flex;
   align-items: center;
   gap: 12px;
-  transition: border-color 0.2s;
+  transition: all 0.2s;
 }
 
 .update-card.selected {
